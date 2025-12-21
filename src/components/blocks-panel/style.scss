@@ -37,24 +37,25 @@
 	margin: 0 auto;
 	padding: 0;
 	max-width: 640px;
+	border: 1px solid #e0e0e0;
 }
 
 .blocks-panel__list-item {
-	margin-top: -1px; // Collapse borders with previous element
+	border-bottom: 1px solid #e0e0e0;
 
-	&:first-child {
-		margin-top: 0;
+	&:last-child {
+		border-bottom: none;
 	}
 }
 
-// Block card button - table style with borders
+// Block card button - table style
 .blocks-panel__block-card {
 	box-sizing: border-box;
-	border: 1px solid #e0e0e0;
 	width: 100%;
 	height: auto !important;
 	padding: 12px 16px;
 	background: #fff;
+	border: none;
 	border-radius: 0;
 	cursor: pointer;
 	text-align: left;
