@@ -44,6 +44,11 @@ class Post_Type {
 	const SOURCES_META_KEY = '_wp_content_guidelines_sources';
 
 	/**
+	 * Meta key for revision history.
+	 */
+	const HISTORY_META_KEY = '_wp_content_guidelines_history';
+
+	/**
 	 * Encode data to JSON with Unicode characters preserved.
 	 *
 	 * @param mixed $data Data to encode.
@@ -764,6 +769,22 @@ class Post_Type {
 		}
 
 		return $draft;
+	}
+
+	/**
+	 * Get revision history for a post.
+	 *
+	 * @param int $post_id The post ID.
+	 * @return array History entries.
+	 */
+	public static function get_history( $post_id ) {
+		$history = get_post_meta( $post_id, self::HISTORY_META_KEY, true );
+
+		if ( empty( $history ) || ! is_array( $history ) ) {
+			return array();
+		}
+
+		return $history;
 	}
 
 	/**

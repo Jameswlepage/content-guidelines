@@ -159,7 +159,7 @@ For WordPress 6.9+, the plugin also registers with the Abilities API for AI assi
 
 ## Development
 
-For local development with WordPress Playground:
+For local development with `@wordpress/env` (wp-env):
 
 ```bash
 # Clone the repo
@@ -170,11 +170,13 @@ cd content-guidelines
 pnpm install
 pnpm run build
 
-# Start Playground with auto-mount
-npx @wp-playground/cli@latest server --auto-mount --port 7021 --login --blueprint=blueprint-dev.json
+# Start WordPress (Docker required)
+pnpm wp-env:start
 ```
 
-The dev blueprint enables application passwords for API testing without HTTPS.
+By default this project runs wp-env on `http://localhost:6000` (configured in `.wp-env.json`).
+
+Optional: WordPress Playground is still supported for quick previews via `blueprint.json` / `blueprint-dev.json`.
 
 ## Related Docs
 

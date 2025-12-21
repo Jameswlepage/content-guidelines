@@ -16,6 +16,10 @@
 	"scripts": {
 		"build": "wp-scripts build",
 		"start": "wp-scripts start",
+		"wp-env:start": "wp-env start --update",
+		"wp-env:stop": "wp-env stop",
+		"wp-env:destroy": "wp-env destroy",
+		"wp-env:logs": "wp-env logs",
 		"lint:js": "wp-scripts lint-js",
 		"lint:css": "wp-scripts lint-style",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
@@ -24,6 +28,7 @@
 	},
 	"devDependencies": {
 		"@wordpress/build": "^0.4.0",
+		"@wordpress/env": "^10.22.0",
 		"@wordpress/scripts": "^27.0.0"
 	},
 	"dependencies": {
