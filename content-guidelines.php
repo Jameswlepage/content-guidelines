@@ -3,7 +3,7 @@
  * Plugin Name: Content Guidelines
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Site-level editorial guidelines for WordPress. Define voice, tone, copy rules, and vocabulary that AI features can consume.
- * Version: 0.2.0
+ * Version: 0.0.1
  * Author: WordPress Contributors
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@ namespace ContentGuidelines;
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CONTENT_GUIDELINES_VERSION', '0.2.0' );
+define( 'CONTENT_GUIDELINES_VERSION', '0.0.1' );
 define( 'CONTENT_GUIDELINES_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CONTENT_GUIDELINES_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 

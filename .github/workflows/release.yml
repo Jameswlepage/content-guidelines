@@ -1,0 +1,48 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - name: Create plugin ZIP
+        run: |
+          mkdir -p content-guidelines
+          cp -r build content-guidelines/
+          cp -r includes content-guidelines/
+          cp -r docs content-guidelines/
+          cp content-guidelines.php content-guidelines/
+          cp readme.txt content-guidelines/ 2>/dev/null || true
+          cp README.md content-guidelines/
+          zip -r content-guidelines.zip content-guidelines
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: content-guidelines.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
