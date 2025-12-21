@@ -1,0 +1,23 @@
+{
+    "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+    "landingPage": "/wp-admin/admin.php?page=content-guidelines",
+    "login": true,
+    "steps": [
+        {
+            "step": "writeFile",
+            "path": "/wordpress/wp-content/mu-plugins/dev-environment.php",
+            "data": "<?php\n// Enable application passwords without HTTPS for development\nadd_filter('wp_is_application_passwords_available', '__return_true');\nadd_filter('application_password_is_api_request', '__return_true');"
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "wordpress.org/plugins",
+                "slug": "gutenberg"
+            }
+        },
+        {
+            "step": "activatePlugin",
+            "pluginPath": "content-guidelines/content-guidelines.php"
+        }
+    ]
+}

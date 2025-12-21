@@ -1,8 +1,15 @@
 {
     "$schema": "https://playground.wordpress.net/blueprint-schema.json",
-    "landingPage": "/wp-admin/themes.php?page=content-guidelines-wp-admin",
+    "landingPage": "/wp-admin/admin.php?page=content-guidelines",
     "login": true,
     "steps": [
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "wordpress.org/plugins",
+                "slug": "gutenberg"
+            }
+        },
         {
             "step": "installPlugin",
             "pluginData": {
@@ -10,13 +17,6 @@
                 "url": "https://github.com/Jameswlepage/content-guidelines",
                 "ref": "HEAD",
                 "refType": "refname"
-            }
-        },
-        {
-            "step": "installPlugin",
-            "pluginZipFile": {
-                "resource": "wordpress.org/plugins",
-                "slug": "gutenberg"
             }
         }
     ]
