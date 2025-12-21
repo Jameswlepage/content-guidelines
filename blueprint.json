@@ -1,6 +1,6 @@
 {
     "$schema": "https://playground.wordpress.net/blueprint-schema.json",
-    "landingPage": "/wp-admin/admin.php?page=content-guidelines",
+    "landingPage": "/wp-admin/admin.php?page=content-guidelines-wp-admin",
     "login": true,
     "steps": [
         {
