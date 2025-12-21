@@ -3,7 +3,8 @@
 .library-panel {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	flex: 1;
+	min-height: 0;
 }
 
 // Draft notice
@@ -85,7 +86,8 @@
 .library-panel .components-navigator-provider {
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
+	flex: 1;
+	min-height: 0;
 }
 
 .library-panel .components-navigator-screen {

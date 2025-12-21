@@ -1,5 +1,36 @@
 // Guidelines page styles - matching fonts library pattern exactly
 
+// Prevent page-level scrolling
+#wpwrap {
+	overflow: hidden;
+}
+
+// Fix boot container to viewport height (override min-height with height)
+.boot-layout-container {
+	height: calc(100vh - 32px - 8px); // Match the min-height value but as fixed height
+	min-height: 0; // Override the min-height
+	max-height: calc(100vh - 32px - 8px);
+
+	@media (max-width: 782px) {
+		height: calc(100vh - 46px - 8px);
+		max-height: calc(100vh - 46px - 8px);
+	}
+
+	@media (max-width: 600px) {
+		height: calc(100vh - 46px);
+		max-height: calc(100vh - 46px);
+	}
+}
+
+// Constrain admin-ui-page within boot container
+.boot-layout-container > .admin-ui-page {
+	flex: 1;
+	min-height: 0; // Critical: allow shrinking within flex container
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
 // Header actions container - fills available space
 .guidelines-page__header-actions {
 	display: flex;
@@ -69,7 +100,8 @@
 .guidelines-page__tabs {
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
+	flex: 1;
+	min-height: 0; // Allow shrinking within flex container
 	overflow: hidden;
 }
 
@@ -127,10 +159,11 @@
 	}
 }
 
-// Tab panel content area
+// Tab panel content area - this is the scrollable container
 .guidelines-page__tab-panel {
-	flex-grow: 1;
-	overflow: auto;
+	flex: 1;
+	min-height: 0; // Allow shrinking within flex container
+	overflow-y: auto; // Scrollable area for tab content
 	display: flex;
 	flex-direction: column;
 	border: none;
