@@ -1,147 +1,130 @@
-# Content Guidelines for WordPress Core
+# Content Guidelines
 
-A site-level editorial profile that feeds into all AI experiences in WordPress.
+Site-level editorial guidelines for WordPress. Define voice, tone, copy rules, and vocabulary that AI features can consume.
 
 **Global Styles = how your site looks. Content Guidelines = how your site sounds.**
 
-## Quick Links
+## Installation
 
-- [Full Specification](./SPEC.md) — Complete product and technical spec
-- [Summary](./SUMMARY.md) — One-page overview for stakeholders
+1. Download the plugin
+2. Upload to `/wp-content/plugins/content-guidelines`
+3. Activate via Plugins menu
+4. Access via **Appearance > Guidelines**
 
-## What This Is
+## Quick Start
 
-Content Guidelines stores your site's tone, voice, copy rules, vocabulary, and brand context in a single canonical location. Every AI feature in WordPress can reference it, so you don't have to re-explain your brand every time.
+### Get Guidelines in PHP
 
-### Key Features
+```php
+// Get a context packet formatted for AI prompts
+$packet = wp_get_content_guidelines_packet( array(
+    'task' => 'writing',  // or 'headline', 'cta', 'image', 'coach'
+) );
 
-- **Site-level guidelines** — One source of truth for editorial voice
-- **Draft → Publish workflow** — Iterate safely without affecting production AI
-- **Versioning** — Full history with restore capability
-- **Playground** — Test changes instantly against real content
-- **Provider-agnostic** — Core owns storage/UI/APIs; any AI provider can plug in
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     WordPress Core                               │
-├─────────────────────────────────────────────────────────────────┤
-│  wp_content_guidelines (CPT)                                     │
-│  ├── post_content (JSON) ← Active guidelines, versioned         │
-│  └── post_meta: _wp_content_guidelines_draft ← Draft state      │
-├─────────────────────────────────────────────────────────────────┤
-│  PHP API: wp_get_content_guidelines_packet()                     │
-│  REST: /wp/v2/content-guidelines/*                               │
-├─────────────────────────────────────────────────────────────────┤
-│  UI: Site Editor → Guidelines                                    │
-│  ├── Guidelines tab (structured editor)                          │
-│  ├── Playground tab (test loop)                                  │
-│  └── History (versioning)                                        │
-├─────────────────────────────────────────────────────────────────┤
-│  Provider Hooks (AI-agnostic)                                    │
-│  ├── wp_ai_generate_content_guidelines_draft                     │
-│  └── wp_ai_run_guidelines_playground_task                        │
-└─────────────────────────────────────────────────────────────────┘
-         ↓                    ↓                    ↓
-    Jetpack AI           VIP Plugins          Third-party
+// Use in your AI prompt
+$prompt = $packet['packet_text'] . "\n\nWrite a headline for: " . $title;
 ```
 
-## Data Schema (v1)
+### Get Guidelines via REST API
+
+```bash
+# Get the context packet
+curl -X GET \
+  'https://yoursite.com/wp-json/wp/v2/content-guidelines/packet?task=writing' \
+  -H 'Authorization: Basic YOUR_APP_PASSWORD'
+```
+
+### Get Guidelines via Abilities API (WordPress 6.9+)
+
+```php
+$ability = wp_get_ability( 'content-guidelines/get-context-packet' );
+$result = $ability->execute( array( 'task' => 'headline' ) );
+```
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [PHP API](./docs/php-api.md) | PHP functions and usage examples |
+| [REST API](./docs/rest-api.md) | REST endpoints and authentication |
+| [Abilities API](./docs/abilities-api.md) | WordPress 6.9+ Abilities integration |
+| [Integration Guide](./docs/integration-guide.md) | How to build AI provider plugins |
+
+## Features
+
+- **Site-level guidelines** - One source of truth for editorial voice
+- **Draft/Publish workflow** - Iterate safely without affecting production
+- **Version history** - Full revision history with restore capability
+- **Playground** - Test changes against real content before publishing
+- **Block-specific rules** - Set guidelines per block type
+- **AI-agnostic** - Works with any AI provider
+
+## For AI Providers
+
+Content Guidelines provides storage and UI. Your plugin provides AI:
+
+```php
+// Register as an AI provider
+add_filter( 'wp_content_guidelines_has_ai_provider', '__return_true' );
+
+// Handle playground tests
+add_filter( 'wp_content_guidelines_run_playground_test', function( $result, $request ) {
+    // $request['context_packet']['packet_text'] contains formatted guidelines
+    // $request['fixture_content'] contains the test content
+    // Return: array( 'output' => 'AI generated text...' )
+    return my_ai_generate( $request );
+}, 10, 2 );
+```
+
+See [Integration Guide](./docs/integration-guide.md) for complete examples.
+
+## Data Schema
 
 ```json
 {
   "version": 1,
   "brand_context": {
-    "site_description": "",
-    "audience": "",
-    "primary_goal": "subscribe|sell|inform|community|other",
-    "topics": []
+    "site_description": "About this site",
+    "audience": "Target readers",
+    "primary_goal": "inform"
   },
   "voice_tone": {
-    "tone_traits": [],
-    "pov": "we_you|i_you|third_person",
-    "readability": "simple|general|expert"
+    "tone_traits": ["friendly", "professional"],
+    "pov": "we_you",
+    "readability": "general"
   },
   "copy_rules": {
-    "dos": [],
-    "donts": [],
-    "formatting": []
+    "dos": ["Use active voice"],
+    "donts": ["Avoid jargon"],
+    "formatting": ["h2s", "bullets"]
   },
   "vocabulary": {
-    "prefer": [],
-    "avoid": []
+    "prefer": [{"term": "sustainable", "note": "Our core value"}],
+    "avoid": [{"term": "green", "note": "Too vague"}]
   },
   "image_style": {
-    "dos": [],
-    "donts": [],
-    "text_policy": "never|only_if_requested|ok"
+    "dos": ["Natural lighting"],
+    "donts": ["Stock photos"],
+    "text_policy": "never"
   },
-  "notes": ""
+  "notes": "Additional context..."
 }
 ```
 
-## REST API
+## Requirements
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/wp/v2/content-guidelines` | Get active + draft |
-| `PUT` | `/wp/v2/content-guidelines/draft` | Update draft |
-| `POST` | `/wp/v2/content-guidelines/publish` | Promote draft → active |
-| `POST` | `/wp/v2/content-guidelines/discard-draft` | Clear draft |
-| `GET` | `/wp/v2/content-guidelines/revisions` | List history |
-| `POST` | `/wp/v2/content-guidelines/restore/{id}` | Restore revision |
-| `POST` | `/wp/v2/content-guidelines/test` | Run Playground task |
+- WordPress 6.7+
+- PHP 7.4+
+- Gutenberg plugin (for full UI)
 
-## PHP API
+For WordPress 6.9+, the plugin also registers with the Abilities API for AI assistant integration.
 
-```php
-// Get context packet for AI consumption
-$packet = wp_get_content_guidelines_packet( array(
-    'task'      => 'headline',  // writing, headline, cta, image, coach
-    'post_id'   => 123,         // optional context
-    'use'       => 'active',    // or 'draft'
-    'max_chars' => 2000,        // token budget
-) );
+## Related Docs
 
-// Returns:
-// - packet_text: formatted string for LLM prompt
-// - packet_structured: array subset of schema
-// - guidelines_id, revision_id, updated_at
-```
+- [Full Specification](./SPEC.md) - Complete product and technical spec
+- [Summary](./SUMMARY.md) - One-page overview for stakeholders
+- [Implementation Notes](./IMPLEMENTATION.md) - Development details
 
-## Provider Hooks
+## License
 
-```php
-// Generation hook (providers supply AI)
-add_filter( 'wp_ai_generate_content_guidelines_draft', function( $draft, $site_context, $args ) {
-    // Generate structured guidelines from site content
-    return $generated_draft;
-}, 10, 3 );
-
-// Playground hook (providers supply AI)
-add_filter( 'wp_ai_run_guidelines_playground_task', function( $result, $request_args ) {
-    // Run task using guidelines + fixture content
-    return array( 'output_text' => $generated_output );
-}, 10, 2 );
-```
-
-## Implementation Milestones
-
-1. **Scaffolding** — CPT, REST, basic UI
-2. **Versioning** — Revisions, history, restore
-3. **Playground** — Test loop, fixture selection, compare mode
-4. **Auto-Generation** — Generate from site content (provider-dependent)
-5. **AI Surface Integration** — "Using: Site guidelines" chip everywhere
-
-## Prior Art / Alignment
-
-This follows established WordPress Core patterns:
-
-- Storage: Like `wp_global_styles` (CPT with revisions)
-- UI: Like Styles panel in Site Editor
-- Resolution: Like `WP_Theme_JSON_Resolver` (merge defaults + user overrides)
-
-## Status
-
-Spec complete. Ready for engineering scoping and implementation.
+GPL-2.0-or-later

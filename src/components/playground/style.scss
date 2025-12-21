@@ -4,8 +4,12 @@
 
 .content-guidelines-playground {
 	padding: 24px;
+	min-width: 400px;
 	max-width: 640px;
+	width: 100%;
 	margin: 0 auto;
+	box-sizing: border-box;
+	border: 1px solid #e0e0e0;
 }
 
 .content-guidelines-playground__controls {

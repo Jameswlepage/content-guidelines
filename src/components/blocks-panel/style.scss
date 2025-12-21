@@ -6,16 +6,30 @@
 	height: 100%;
 }
 
-// Search container
-.blocks-panel__search {
+// Content container - centered with max-width
+.blocks-panel__content {
 	max-width: 640px;
 	margin: 0 auto;
-	padding: 24px 24px 16px;
+	padding: 24px;
 	width: 100%;
 	box-sizing: border-box;
+}
+
+// Search container
+.blocks-panel__search {
+	margin-bottom: 24px;
 
 	.components-search-control {
 		width: 100%;
+	}
+}
+
+// Section container (Common, All Blocks)
+.blocks-panel__section {
+	margin-bottom: 24px;
+
+	&:last-child {
+		margin-bottom: 0;
 	}
 }
 
@@ -26,22 +40,25 @@
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
 	color: #1e1e1e;
-	margin: 0 auto 0;
+	margin: 0 0 8px;
 	padding: 0;
-	max-width: 640px;
 }
 
 // Block list
 .blocks-panel__list {
 	list-style: none;
-	margin: 0 auto;
+	margin: 0;
 	padding: 0;
+	min-width: 400px;
 	max-width: 640px;
+	width: 100%;
 	border: 1px solid #e0e0e0;
 }
 
 .blocks-panel__list-item {
 	border-bottom: 1px solid #e0e0e0;
+	margin: 0;
+	padding: 0;
 
 	&:last-child {
 		border-bottom: none;
@@ -51,17 +68,19 @@
 // Block card button - table style
 .blocks-panel__block-card {
 	box-sizing: border-box;
+	display: block;
 	width: 100%;
 	height: auto !important;
 	padding: 12px 16px;
-	background: #fff;
+	margin: 0;
+	background: transparent;
 	border: none;
 	border-radius: 0;
 	cursor: pointer;
 	text-align: left;
 
 	&:hover {
-		background: #f8f8f8;
+		background: #f6f7f7;
 	}
 
 	&:focus {
@@ -83,7 +102,7 @@
 
 .blocks-panel__block-status {
 	font-size: 12px;
-	color: #757575;
+	color: var(--wp-admin-theme-color, #3858e9);
 }
 
 // Chevron icon
@@ -100,7 +119,7 @@
 }
 
 .blocks-panel .components-navigator-screen {
-	padding: 24px;
+	padding: 0;
 	width: 100%;
 	box-sizing: border-box;
 }
@@ -109,6 +128,7 @@
 .blocks-panel__detail-container {
 	max-width: 640px;
 	margin: 0 auto;
+	padding: 24px;
 }
 
 // Detail screen header
@@ -148,11 +168,24 @@
 	}
 }
 
+// Loading state
+.blocks-panel__loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 48px 24px;
+	gap: 16px;
+}
+
+// Error state
+.blocks-panel__error {
+	color: #cc1818;
+}
+
 // Empty state
 .blocks-panel__empty {
-	padding: 24px;
 	text-align: center;
+	padding: 24px;
 	color: #757575;
-	max-width: 640px;
-	margin: 0 auto;
 }

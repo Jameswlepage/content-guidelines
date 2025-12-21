@@ -313,10 +313,28 @@ export default function BlocksPanel() {
 		return { priorityBlocks: priority, otherBlocks: other };
 	}, [ filteredBlocks ] );
 
+	/**
+	 * Check if a block has meaningful guidelines configured.
+	 *
+	 * @param {string} blockName Block name.
+	 * @return {string|null} Status text or null.
+	 */
 	const getBlockStatus = ( blockName ) => {
-		if ( blockGuidelines[ blockName ] ) {
-			return __( 'Has guidelines', 'content-guidelines' );
+		const guidelines = blockGuidelines[ blockName ];
+		if ( ! guidelines ) {
+			return null;
 		}
+
+		// Check if there's any actual content
+		const hasCopyRules =
+			( guidelines.copy_rules?.dos?.length > 0 ) ||
+			( guidelines.copy_rules?.donts?.length > 0 );
+		const hasNotes = guidelines.notes && guidelines.notes.trim().length > 0;
+
+		if ( hasCopyRules || hasNotes ) {
+			return __( 'Configured', 'content-guidelines' );
+		}
+
 		return null;
 	};
 
@@ -357,7 +375,7 @@ export default function BlocksPanel() {
 		<div className="blocks-panel">
 			<Navigator initialPath={ selectedBlock ? '/block' : '/' }>
 				<Navigator.Screen path="/">
-					<VStack spacing={ 4 }>
+					<div className="blocks-panel__content">
 						<div className="blocks-panel__search">
 							<SearchControl
 								__nextHasNoMarginBottom
@@ -368,7 +386,7 @@ export default function BlocksPanel() {
 						</div>
 
 						{ priorityBlocks.length > 0 && (
-							<VStack spacing={ 0 }>
+							<div className="blocks-panel__section">
 								<h2 className="blocks-panel__list-title">
 									{ __( 'Common', 'content-guidelines' ) }
 								</h2>
@@ -384,11 +402,11 @@ export default function BlocksPanel() {
 										</li>
 									) ) }
 								</ul>
-							</VStack>
+							</div>
 						) }
 
 						{ otherBlocks.length > 0 && (
-							<VStack spacing={ 0 }>
+							<div className="blocks-panel__section">
 								<h2 className="blocks-panel__list-title">
 									{ __( 'All Blocks', 'content-guidelines' ) }
 								</h2>
@@ -404,15 +422,15 @@ export default function BlocksPanel() {
 										</li>
 									) ) }
 								</ul>
-							</VStack>
+							</div>
 						) }
 
 						{ filteredBlocks.length === 0 && (
-							<Text variant="muted">
+							<Text variant="muted" className="blocks-panel__empty">
 								{ __( 'No blocks found.', 'content-guidelines' ) }
 							</Text>
 						) }
-					</VStack>
+					</div>
 				</Navigator.Screen>
 
 				<Navigator.Screen path="/block">
