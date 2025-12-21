@@ -1,7 +1,10 @@
 {
 	"port": 6000,
 	"testsPort": 6001,
-	"plugins": [ "." ],
+	"plugins": [
+		"https://downloads.wordpress.org/plugin/gutenberg.zip",
+		"."
+	],
 	"config": {
 		"WP_DEBUG": true,
 		"SCRIPT_DEBUG": true
