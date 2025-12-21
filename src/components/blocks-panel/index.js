@@ -342,12 +342,12 @@ export default function BlocksPanel() {
 	if ( isLoading ) {
 		return (
 			<div className="blocks-panel">
-				<VStack spacing={ 4 } alignment="center">
+				<div className="blocks-panel__loading">
 					<Spinner />
 					<Text variant="muted">
 						{ __( 'Loading blocks…', 'content-guidelines' ) }
 					</Text>
-				</VStack>
+				</div>
 			</div>
 		);
 	}
@@ -356,7 +356,7 @@ export default function BlocksPanel() {
 	if ( error ) {
 		return (
 			<div className="blocks-panel">
-				<VStack spacing={ 4 }>
+				<div className="blocks-panel__loading">
 					<Text className="blocks-panel__error">
 						{ error }
 					</Text>
@@ -366,7 +366,7 @@ export default function BlocksPanel() {
 					>
 						{ __( 'Retry', 'content-guidelines' ) }
 					</Button>
-				</VStack>
+				</div>
 			</div>
 		);
 	}

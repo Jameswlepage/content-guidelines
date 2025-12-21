@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import {
-	TabPanel,
 	Spinner,
 	Notice,
 	Button,
@@ -21,6 +20,7 @@ import LibraryPanel from '../library-panel';
 import BlocksPanel from '../blocks-panel';
 import PlaygroundPanel from '../playground';
 import HistoryPanel from '../history';
+import ImportExportPanel from '../import-export';
 import EmptyState from '../guidelines-screen/empty-state';
 import './style.scss';
 
@@ -83,6 +83,7 @@ function HeaderActions( { hasDraft, isSaving, isPublishing, onShowHistory } ) {
  */
 export default function GuidelinesPage() {
 	const [ showHistory, setShowHistory ] = useState( false );
+	const [ activeTab, setActiveTab ] = useState( 'library' );
 
 	const {
 		active,
@@ -137,19 +138,14 @@ export default function GuidelinesPage() {
 		);
 	}
 
-	const tabs = [
-		{
-			name: 'library',
-			title: __( 'Library', 'content-guidelines' ),
-		},
-		{
-			name: 'blocks',
-			title: __( 'Blocks', 'content-guidelines' ),
-		},
-		{
-			name: 'playground',
-			title: __( 'Playground', 'content-guidelines' ),
-		},
+	const leftTabs = [
+		{ name: 'library', title: __( 'Library', 'content-guidelines' ) },
+		{ name: 'blocks', title: __( 'Blocks', 'content-guidelines' ) },
+		{ name: 'playground', title: __( 'Playground', 'content-guidelines' ) },
+	];
+
+	const rightTabs = [
+		{ name: 'import-export', title: __( 'Import / Export', 'content-guidelines' ) },
 	];
 
 	return (
@@ -175,19 +171,43 @@ export default function GuidelinesPage() {
 				</Notice>
 			) }
 
-			<TabPanel
-				className="guidelines-page__tabs"
-				activeClass="is-active"
-				tabs={ tabs }
-			>
-				{ ( tab ) => (
-					<div className="guidelines-page__tab-panel">
-						{ tab.name === 'library' && <LibraryPanel /> }
-						{ tab.name === 'blocks' && <BlocksPanel /> }
-						{ tab.name === 'playground' && <PlaygroundPanel /> }
+			<div className="guidelines-page__tabs">
+				<div className="guidelines-page__tab-list" role="tablist">
+					<div className="guidelines-page__tab-list-left">
+						{ leftTabs.map( ( tab ) => (
+							<button
+								key={ tab.name }
+								role="tab"
+								aria-selected={ activeTab === tab.name }
+								className={ `guidelines-page__tab ${ activeTab === tab.name ? 'is-active' : '' }` }
+								onClick={ () => setActiveTab( tab.name ) }
+							>
+								{ tab.title }
+							</button>
+						) ) }
 					</div>
-				) }
-			</TabPanel>
+					<div className="guidelines-page__tab-list-right">
+						{ rightTabs.map( ( tab ) => (
+							<button
+								key={ tab.name }
+								role="tab"
+								aria-selected={ activeTab === tab.name }
+								className={ `guidelines-page__tab ${ activeTab === tab.name ? 'is-active' : '' }` }
+								onClick={ () => setActiveTab( tab.name ) }
+							>
+								{ tab.title }
+							</button>
+						) ) }
+					</div>
+				</div>
+
+				<div className="guidelines-page__tab-panel" role="tabpanel">
+					{ activeTab === 'library' && <LibraryPanel /> }
+					{ activeTab === 'blocks' && <BlocksPanel /> }
+					{ activeTab === 'playground' && <PlaygroundPanel /> }
+					{ activeTab === 'import-export' && <ImportExportPanel /> }
+				</div>
+			</div>
 
 			{ showHistory && (
 				<HistoryPanel onClose={ () => setShowHistory( false ) } />
