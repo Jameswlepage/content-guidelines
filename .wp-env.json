@@ -1,6 +1,6 @@
 {
-	"port": 8888,
-	"testsPort": 8889,
+	"port": 8877,
+	"testsPort": 8878,
 	"plugins": [
 		"https://downloads.wordpress.org/plugin/gutenberg.zip",
 		"."
