@@ -20,6 +20,13 @@ class Post_Type {
 	const POST_TYPE = 'wp_content_guidelines';
 
 	/**
+	 * Option key for storing the canonical guidelines post ID.
+	 *
+	 * Prevents multiple CPT posts from being created/used over time.
+	 */
+	const POST_ID_OPTION = 'wp_content_guidelines_post_id';
+
+	/**
 	 * Meta key for draft guidelines.
 	 */
 	const DRAFT_META_KEY = '_wp_content_guidelines_draft';
@@ -404,17 +411,26 @@ class Post_Type {
 	 * @return \WP_Post|null The guidelines post or null on failure.
 	 */
 	public static function get_guidelines_post() {
+		$stored_post_id = absint( get_option( self::POST_ID_OPTION, 0 ) );
+		if ( $stored_post_id ) {
+			$stored_post = get_post( $stored_post_id );
+			if ( $stored_post && self::POST_TYPE === $stored_post->post_type ) {
+				return $stored_post;
+			}
+		}
+
 		$posts = get_posts(
 			array(
 				'post_type'      => self::POST_TYPE,
 				'posts_per_page' => 1,
-				'post_status'    => array( 'publish', 'draft' ),
-				'orderby'        => 'date',
+				'post_status'    => array( 'publish', 'draft', 'private', 'pending', 'future' ),
+				'orderby'        => 'modified',
 				'order'          => 'DESC',
 			)
 		);
 
 		if ( ! empty( $posts ) ) {
+			update_option( self::POST_ID_OPTION, absint( $posts[0]->ID ), false );
 			return $posts[0];
 		}
 
@@ -437,6 +453,10 @@ class Post_Type {
 			),
 			true
 		);
+
+		if ( ! is_wp_error( $post_id ) ) {
+			update_option( self::POST_ID_OPTION, absint( $post_id ), false );
+		}
 
 		return $post_id;
 	}
