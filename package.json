@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/content-guidelines",
-	"version": "0.2.0",
+	"version": "0.0.1",
 	"description": "Site-level editorial guidelines for WordPress",
 	"author": "WordPress Contributors",
 	"license": "GPL-2.0-or-later",

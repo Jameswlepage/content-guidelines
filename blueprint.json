@@ -13,10 +13,8 @@
         {
             "step": "installPlugin",
             "pluginData": {
-                "resource": "git:directory",
-                "url": "https://github.com/Jameswlepage/content-guidelines",
-                "ref": "HEAD",
-                "refType": "refname"
+                "resource": "url",
+                "url": "https://github.com/Jameswlepage/content-guidelines/releases/latest/download/content-guidelines.zip"
             }
         }
     ]
