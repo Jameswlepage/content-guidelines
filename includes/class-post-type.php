@@ -27,6 +27,13 @@ class Post_Type {
 	const POST_ID_OPTION = 'wp_content_guidelines_post_id';
 
 	/**
+	 * Option key for tracking history migration.
+	 *
+	 * Used to avoid rebuilding history on every request.
+	 */
+	const HISTORY_MIGRATED_OPTION = 'wp_content_guidelines_history_migrated_post_id';
+
+	/**
 	 * Meta key for draft guidelines.
 	 */
 	const DRAFT_META_KEY = '_wp_content_guidelines_draft';
@@ -35,6 +42,16 @@ class Post_Type {
 	 * Meta key for generation sources.
 	 */
 	const SOURCES_META_KEY = '_wp_content_guidelines_sources';
+
+	/**
+	 * Encode data to JSON with Unicode characters preserved.
+	 *
+	 * @param mixed $data Data to encode.
+	 * @return string|false JSON string or false on failure.
+	 */
+	private static function json_encode_unicode( $data ) {
+		return wp_json_encode( $data, JSON_UNESCAPED_UNICODE );
+	}
 
 	/**
 	 * Initialize the post type.
@@ -423,9 +440,10 @@ class Post_Type {
 			array(
 				'post_type'      => self::POST_TYPE,
 				'posts_per_page' => 1,
-				'post_status'    => array( 'publish', 'draft', 'private', 'pending', 'future' ),
+				'post_status'    => 'any',
 				'orderby'        => 'modified',
 				'order'          => 'DESC',
+				'no_found_rows'  => true,
 			)
 		);
 
@@ -435,6 +453,189 @@ class Post_Type {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Ensure history is consolidated onto the canonical guidelines post.
+	 *
+	 * Older versions of the plugin could create multiple guidelines posts; this
+	 * migrates/merges revision history across posts into the canonical post so
+	 * the History UI consistently shows past publishes.
+	 *
+	 * @param int   $canonical_post_id Canonical guidelines post ID.
+	 * @param array $all_post_ids      Optional array of all guidelines post IDs.
+	 * @return void
+	 */
+	private static function maybe_migrate_history_to_canonical_post( $canonical_post_id, $all_post_ids = array() ) {
+		$canonical_post_id = absint( $canonical_post_id );
+		if ( ! $canonical_post_id ) {
+			return;
+		}
+
+		$migrated_for = absint( get_option( self::HISTORY_MIGRATED_OPTION, 0 ) );
+		if ( $migrated_for === $canonical_post_id ) {
+			return;
+		}
+
+		if ( empty( $all_post_ids ) ) {
+			$all_post_ids = get_posts(
+				array(
+					'post_type'      => self::POST_TYPE,
+					'posts_per_page' => -1,
+					'post_status'    => 'any',
+					'fields'         => 'ids',
+					'no_found_rows'  => true,
+				)
+			);
+			$all_post_ids = array_map( 'absint', (array) $all_post_ids );
+		}
+
+		$all_post_ids = array_values( array_unique( array_filter( $all_post_ids ) ) );
+		if ( empty( $all_post_ids ) ) {
+			update_option( self::HISTORY_MIGRATED_OPTION, $canonical_post_id, false );
+			return;
+		}
+
+		$existing_canonical = self::get_history( $canonical_post_id );
+		$has_other_history  = false;
+
+		foreach ( $all_post_ids as $post_id ) {
+			if ( $post_id === $canonical_post_id ) {
+				continue;
+			}
+			$history = self::get_history( $post_id );
+			if ( ! empty( $history ) ) {
+				$has_other_history = true;
+				break;
+			}
+		}
+
+		// Only migrate if it would add value.
+		if ( ! empty( $existing_canonical ) && ! $has_other_history ) {
+			update_option( self::HISTORY_MIGRATED_OPTION, $canonical_post_id, false );
+			return;
+		}
+
+		$entries = array();
+		$seen    = array();
+
+		foreach ( $all_post_ids as $post_id ) {
+			$post = get_post( $post_id );
+			if ( ! $post || self::POST_TYPE !== $post->post_type ) {
+				continue;
+			}
+
+			// 1) Prefer existing meta-backed history.
+			$history = self::get_history( $post_id );
+			if ( ! empty( $history ) ) {
+				foreach ( $history as $entry ) {
+					if ( empty( $entry['date_gmt'] ) || empty( $entry['guidelines'] ) ) {
+						continue;
+					}
+
+					$date_gmt   = sanitize_text_field( $entry['date_gmt'] );
+					$guidelines = is_array( $entry['guidelines'] ) ? $entry['guidelines'] : array();
+					if ( empty( $date_gmt ) || empty( $guidelines ) ) {
+						continue;
+					}
+
+					$hash = md5( wp_json_encode( $guidelines ) . '|' . $date_gmt );
+					if ( isset( $seen[ $hash ] ) ) {
+						continue;
+					}
+					$seen[ $hash ] = true;
+
+					$entries[] = array(
+						'author_id'  => isset( $entry['author_id'] ) ? absint( $entry['author_id'] ) : absint( $post->post_author ),
+						'date_gmt'   => $date_gmt,
+						'guidelines' => self::sanitize_guidelines( $guidelines ),
+					);
+				}
+
+				continue;
+			}
+
+			// 2) Fall back to WP revisions if available.
+			$revisions = wp_get_post_revisions(
+				$post_id,
+				array(
+					'order'         => 'ASC',
+					'orderby'       => 'date',
+					'check_enabled' => false,
+				)
+			);
+
+			if ( ! empty( $revisions ) ) {
+				foreach ( $revisions as $revision ) {
+					$decoded = json_decode( $revision->post_content, true );
+					if ( ! is_array( $decoded ) ) {
+						continue;
+					}
+
+					$date_gmt = $revision->post_modified_gmt ? $revision->post_modified_gmt : $revision->post_date_gmt;
+					$date_gmt = $date_gmt ? sanitize_text_field( $date_gmt ) : '';
+					if ( empty( $date_gmt ) ) {
+						continue;
+					}
+
+					$hash = md5( wp_json_encode( $decoded ) . '|' . $date_gmt );
+					if ( isset( $seen[ $hash ] ) ) {
+						continue;
+					}
+					$seen[ $hash ] = true;
+
+					$entries[] = array(
+						'author_id'  => absint( $revision->post_author ),
+						'date_gmt'   => $date_gmt,
+						'guidelines' => self::sanitize_guidelines( $decoded ),
+					);
+				}
+			}
+
+			// 3) Finally, include the current post content snapshot.
+			$current = json_decode( $post->post_content, true );
+			if ( is_array( $current ) ) {
+				$date_gmt = $post->post_modified_gmt ? $post->post_modified_gmt : $post->post_date_gmt;
+				$date_gmt = $date_gmt ? sanitize_text_field( $date_gmt ) : '';
+				if ( ! empty( $date_gmt ) ) {
+					$hash = md5( wp_json_encode( $current ) . '|' . $date_gmt );
+					if ( ! isset( $seen[ $hash ] ) ) {
+						$seen[ $hash ] = true;
+						$entries[]     = array(
+							'author_id'  => absint( $post->post_author ),
+							'date_gmt'   => $date_gmt,
+							'guidelines' => self::sanitize_guidelines( $current ),
+						);
+					}
+				}
+			}
+		}
+
+		if ( empty( $entries ) ) {
+			update_option( self::HISTORY_MIGRATED_OPTION, $canonical_post_id, false );
+			return;
+		}
+
+		usort(
+			$entries,
+			function ( $a, $b ) {
+				return strcmp( $a['date_gmt'], $b['date_gmt'] );
+			}
+		);
+
+		$migrated = array();
+		$next_id  = 1;
+		foreach ( $entries as $entry ) {
+			$migrated[] = array(
+				'id'         => $next_id++,
+				'author_id'  => absint( $entry['author_id'] ),
+				'date_gmt'   => $entry['date_gmt'],
+				'guidelines' => $entry['guidelines'],
+			);
+		}
+
+		update_post_meta( $canonical_post_id, self::HISTORY_META_KEY, $migrated );
+		update_option( self::HISTORY_MIGRATED_OPTION, $canonical_post_id, false );
 	}
 
 	/**
@@ -449,7 +650,7 @@ class Post_Type {
 				'post_type'    => self::POST_TYPE,
 				'post_status'  => 'publish',
 				'post_title'   => __( 'Content Guidelines', 'content-guidelines' ),
-				'post_content' => wp_json_encode( self::get_default_guidelines( $data ) ),
+				'post_content' => self::json_encode_unicode( self::get_default_guidelines( $data ) ),
 			),
 			true
 		);
@@ -616,7 +817,7 @@ class Post_Type {
 		$result = wp_update_post(
 			array(
 				'ID'           => $post->ID,
-				'post_content' => wp_json_encode( $draft ),
+				'post_content' => self::json_encode_unicode( $draft ),
 			),
 			true
 		);

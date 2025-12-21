@@ -301,13 +301,23 @@ class REST_Controller {
 		$active = Post_Type::get_active_guidelines();
 		$draft  = Post_Type::get_draft_guidelines();
 
+		$revision_count = 0;
+		if ( $post ) {
+			$history = Post_Type::get_history( $post->ID );
+			if ( ! empty( $history ) ) {
+				$revision_count = count( $history );
+			} else {
+				$revision_count = count( wp_get_post_revisions( $post->ID, array( 'check_enabled' => false ) ) );
+			}
+		}
+
 		$response = array(
 			'active'         => $active ? $active : Post_Type::get_default_guidelines(),
 			'draft'          => $draft,
 			'has_draft'      => ! empty( $draft ),
 			'post_id'        => $post ? $post->ID : null,
 			'updated_at'     => $post ? $post->post_modified_gmt : null,
-			'revision_count' => $post ? count( wp_get_post_revisions( $post->ID, array( 'check_enabled' => false ) ) ) : 0,
+			'revision_count' => $revision_count,
 		);
 
 		return rest_ensure_response( $response );
@@ -387,6 +397,45 @@ class REST_Controller {
 			return rest_ensure_response( array() );
 		}
 
+		$history = Post_Type::get_history( $post->ID );
+		if ( ! empty( $history ) ) {
+			// Newest first.
+			usort(
+				$history,
+				function ( $a, $b ) {
+					return absint( $b['id'] ) <=> absint( $a['id'] );
+				}
+			);
+
+			$items = array();
+
+			foreach ( $history as $entry ) {
+				$author = null;
+				if ( ! empty( $entry['author_id'] ) ) {
+					$author = get_userdata( absint( $entry['author_id'] ) );
+				}
+
+				$date_gmt_mysql = isset( $entry['date_gmt'] ) ? $entry['date_gmt'] : '';
+				$date_gmt       = $date_gmt_mysql ? mysql_to_rfc3339( $date_gmt_mysql ) : '';
+				$date_mysql     = $date_gmt_mysql ? get_date_from_gmt( $date_gmt_mysql ) : '';
+				$date           = $date_mysql ? mysql_to_rfc3339( $date_mysql ) : '';
+
+				$items[] = array(
+					'id'          => absint( $entry['id'] ),
+					'author'      => array(
+						'id'   => ! empty( $entry['author_id'] ) ? absint( $entry['author_id'] ) : 0,
+						'name' => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
+					),
+					'date'        => $date,
+					'date_gmt'    => $date_gmt,
+					'modified'    => $date,
+					'modified_gmt' => $date_gmt,
+				);
+			}
+
+			return rest_ensure_response( $items );
+		}
+
 		$revisions = wp_get_post_revisions(
 			$post->ID,
 			array(
@@ -396,7 +445,21 @@ class REST_Controller {
 			)
 		);
 
-		$items = array();
+		$items  = array();
+		$author = get_userdata( $post->post_author );
+
+		// Always include the current version first.
+		$items[] = array(
+			'id'          => $post->ID,
+			'author'      => array(
+				'id'   => absint( $post->post_author ),
+				'name' => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
+			),
+			'date'        => mysql_to_rfc3339( $post->post_modified ),
+			'date_gmt'    => mysql_to_rfc3339( $post->post_modified_gmt ),
+			'modified'    => mysql_to_rfc3339( $post->post_modified ),
+			'modified_gmt' => mysql_to_rfc3339( $post->post_modified_gmt ),
+		);
 
 		foreach ( $revisions as $revision ) {
 			$author = get_userdata( $revision->post_author );
@@ -407,10 +470,10 @@ class REST_Controller {
 					'id'   => $revision->post_author,
 					'name' => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
 				),
-				'date'        => $revision->post_date,
-				'date_gmt'    => $revision->post_date_gmt,
-				'modified'    => $revision->post_modified,
-				'modified_gmt' => $revision->post_modified_gmt,
+				'date'        => mysql_to_rfc3339( $revision->post_date ),
+				'date_gmt'    => mysql_to_rfc3339( $revision->post_date_gmt ),
+				'modified'    => mysql_to_rfc3339( $revision->post_modified ),
+				'modified_gmt' => mysql_to_rfc3339( $revision->post_modified_gmt ),
 			);
 		}
 

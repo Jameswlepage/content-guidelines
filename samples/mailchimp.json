@@ -91,7 +91,7 @@
       "acronyms": ["API - Application Programming Interface", "CRM - Customer Relationship Management", "CTR - Click-Through Rate", "CTA - Call to Action", "ROI - Return on Investment", "A/B - A/B Testing (split testing)", "ESP - Email Service Provider", "GDPR - General Data Protection Regulation", "RSS - Really Simple Syndication", "URL - Uniform Resource Locator"],
       "acronym_usage": "expand_first",
       "custom_dictionary": ["Mailchimp", "Mandrill", "Intuit", "Freddie", "WordPress", "Gutenberg", "TinyLetter", "Mailchimp Presents"],
-      "voice_corrections": ["mail chimp → Mailchimp", "e-mail → email", "click here → descriptive link text", "MailChimp → Mailchimp", "MAILCHIMP → Mailchimp"]
+      "voice_corrections": ["mail chimp to Mailchimp", "e-mail to email", "click here to descriptive link text", "MailChimp to Mailchimp", "MAILCHIMP to Mailchimp"]
     },
     "heuristics": {
       "words_per_sentence": 15,
