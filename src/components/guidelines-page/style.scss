@@ -1,10 +1,52 @@
 // Guidelines page styles - matching fonts library pattern exactly
 
-// Header actions
+// Header actions container - fills available space
 .guidelines-page__header-actions {
 	display: flex;
 	align-items: center;
+	gap: 16px;
+	flex-grow: 1;
+	min-width: 0; // Allow shrinking
+}
+
+// Status area in header - fills middle space
+.guidelines-page__header-status {
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	min-width: 0;
+	overflow: hidden;
+}
+
+// Draft indicator text
+.guidelines-page__draft-indicator {
+	font-size: 13px;
+	color: #d63638;
+	white-space: nowrap;
+}
+
+// Notice in header - compact style
+.guidelines-page__header-notice {
+	margin: 0;
+	padding: 8px 12px;
+	font-size: 13px;
+
+	.components-notice__content {
+		margin: 0;
+	}
+
+	.components-notice__dismiss {
+		align-self: center;
+	}
+}
+
+// Action buttons group
+.guidelines-page__header-buttons {
+	display: flex;
+	align-items: center;
 	gap: 8px;
+	flex-shrink: 0;
 }
 
 // Loading state
@@ -16,11 +58,6 @@
 	padding: 48px;
 	gap: 16px;
 	color: #757575;
-}
-
-// Error notice
-.guidelines-page__error {
-	margin: 16px 24px 0;
 }
 
 // Override admin-ui-page header to match fonts

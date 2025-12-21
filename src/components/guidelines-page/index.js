@@ -25,53 +25,74 @@ import EmptyState from '../guidelines-screen/empty-state';
 import './style.scss';
 
 /**
- * Header actions component.
+ * Header actions component with status notice.
  *
  * @param {Object}   props               Component props.
  * @param {boolean}  props.hasDraft      Whether there are draft changes.
  * @param {boolean}  props.isSaving      Whether currently saving.
  * @param {boolean}  props.isPublishing  Whether currently publishing.
+ * @param {string}   props.error         Error message if any.
+ * @param {Function} props.onClearError  Callback to clear error.
  * @param {Function} props.onShowHistory Callback to show history.
  * @return {JSX.Element} Header actions.
  */
-function HeaderActions( { hasDraft, isSaving, isPublishing, onShowHistory } ) {
+function HeaderActions( { hasDraft, isSaving, isPublishing, error, onClearError, onShowHistory } ) {
 	const { saveDraft, publishGuidelines, discardDraft } =
 		useDispatch( STORE_NAME );
 
 	return (
 		<div className="guidelines-page__header-actions">
-			<Button
-				icon={ backup }
-				label={ __( 'History', 'content-guidelines' ) }
-				onClick={ onShowHistory }
-			/>
-			{ hasDraft && (
-				<>
-					<Button
-						variant="tertiary"
-						onClick={ discardDraft }
-						disabled={ isSaving || isPublishing }
+			<div className="guidelines-page__header-status">
+				{ error && (
+					<Notice
+						status="error"
+						isDismissible
+						onDismiss={ onClearError }
+						className="guidelines-page__header-notice"
 					>
-						{ __( 'Discard', 'content-guidelines' ) }
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={ saveDraft }
-						isBusy={ isSaving }
-						disabled={ isSaving || isPublishing }
-					>
-						{ __( 'Save draft', 'content-guidelines' ) }
-					</Button>
-				</>
-			) }
-			<Button
-				variant="primary"
-				onClick={ publishGuidelines }
-				isBusy={ isPublishing }
-				disabled={ isSaving || isPublishing || ! hasDraft }
-			>
-				{ __( 'Publish', 'content-guidelines' ) }
-			</Button>
+						{ error }
+					</Notice>
+				) }
+				{ hasDraft && ! error && (
+					<span className="guidelines-page__draft-indicator">
+						{ __( 'Draft changes not published', 'content-guidelines' ) }
+					</span>
+				) }
+			</div>
+			<div className="guidelines-page__header-buttons">
+				<Button
+					icon={ backup }
+					label={ __( 'History', 'content-guidelines' ) }
+					onClick={ onShowHistory }
+				/>
+				{ hasDraft && (
+					<>
+						<Button
+							variant="tertiary"
+							onClick={ discardDraft }
+							disabled={ isSaving || isPublishing }
+						>
+							{ __( 'Discard', 'content-guidelines' ) }
+						</Button>
+						<Button
+							variant="secondary"
+							onClick={ saveDraft }
+							isBusy={ isSaving }
+							disabled={ isSaving || isPublishing }
+						>
+							{ __( 'Save draft', 'content-guidelines' ) }
+						</Button>
+					</>
+				) }
+				<Button
+					variant="primary"
+					onClick={ publishGuidelines }
+					isBusy={ isPublishing }
+					disabled={ isSaving || isPublishing || ! hasDraft }
+				>
+					{ __( 'Publish', 'content-guidelines' ) }
+				</Button>
+			</div>
 		</div>
 	);
 }
@@ -156,21 +177,12 @@ export default function GuidelinesPage() {
 					hasDraft={ hasDraft }
 					isSaving={ isSaving }
 					isPublishing={ isPublishing }
+					error={ error }
+					onClearError={ () => clearError( null ) }
 					onShowHistory={ () => setShowHistory( true ) }
 				/>
 			}
 		>
-			{ error && (
-				<Notice
-					status="error"
-					isDismissible
-					onDismiss={ () => clearError( null ) }
-					className="guidelines-page__error"
-				>
-					{ error }
-				</Notice>
-			) }
-
 			<div className="guidelines-page__tabs">
 				<div className="guidelines-page__tab-list" role="tablist">
 					<div className="guidelines-page__tab-list-left">
