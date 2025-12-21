@@ -46,7 +46,7 @@ export function useContentGuidelinesCommands() {
 		label: __( 'Open Content Guidelines', 'content-guidelines' ),
 		icon: edit,
 		callback: ( { close } ) => {
-			window.location.href = 'themes.php?page=content-guidelines-wp-admin';
+			window.location.href = 'themes.php?page=guidelines';
 			close();
 		},
 		context: 'site-editor',
@@ -58,7 +58,7 @@ export function useContentGuidelinesCommands() {
 		icon: backup,
 		callback: ( { close } ) => {
 			window.location.href =
-				'themes.php?page=content-guidelines-wp-admin#/history';
+				'themes.php?page=guidelines#/history';
 			close();
 		},
 	} );
@@ -69,7 +69,7 @@ export function useContentGuidelinesCommands() {
 		icon: seen,
 		callback: ( { close } ) => {
 			window.location.href =
-				'themes.php?page=content-guidelines-wp-admin#/playground';
+				'themes.php?page=guidelines#/playground';
 			close();
 		},
 	} );
@@ -252,7 +252,7 @@ function usePostContextCommands() {
 								actions: [
 									{
 										label: __( 'View', 'content-guidelines' ),
-										url: 'themes.php?page=content-guidelines-wp-admin#/playground',
+										url: 'themes.php?page=guidelines#/playground',
 									},
 								],
 							}
@@ -279,7 +279,7 @@ function usePostContextCommands() {
 			),
 			icon: external,
 			callback: ( { close } ) => {
-				window.location.href = `themes.php?page=content-guidelines-wp-admin#/playground?post=${ currentPostId }`;
+				window.location.href = `themes.php?page=guidelines#/playground?post=${ currentPostId }`;
 				close();
 			},
 		} );

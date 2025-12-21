@@ -3,7 +3,8 @@
 .blocks-panel {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	flex: 1;
+	min-height: 0;
 }
 
 // Content container - centered with max-width
@@ -115,7 +116,8 @@
 .blocks-panel .components-navigator-provider {
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
+	flex: 1;
+	min-height: 0;
 }
 
 .blocks-panel .components-navigator-screen {

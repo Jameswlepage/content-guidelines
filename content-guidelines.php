@@ -78,7 +78,7 @@ function register_admin_menu() {
 		__( 'Guidelines', 'content-guidelines' ),
 		__( 'Guidelines', 'content-guidelines' ),
 		'edit_theme_options',
-		'content-guidelines-wp-admin',
+		'guidelines',
 		__NAMESPACE__ . '\\render_admin_page'
 	);
 }
@@ -116,7 +116,7 @@ function preload_rest_data() {
  */
 function enqueue_admin_scripts( $hook_suffix ) {
 	// Check if we're on our admin page.
-	$is_our_page = isset( $_GET['page'] ) && 'content-guidelines-wp-admin' === $_GET['page']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$is_our_page = isset( $_GET['page'] ) && 'guidelines' === $_GET['page']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 	if ( ! $is_our_page ) {
 		return;
@@ -159,7 +159,7 @@ function enqueue_admin_scripts( $hook_suffix ) {
 	wp_add_inline_script(
 		'content-guidelines-admin',
 		sprintf(
-			'window.contentGuidelinesConfig = { mountId: "content-guidelines-wp-admin-app", routes: %s };',
+			'window.contentGuidelinesConfig = { mountId: "guidelines-app", routes: %s };',
 			wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 		),
 		'before'
@@ -293,7 +293,7 @@ function render_admin_page() {
 			}
 		})();
 	</script>
-	<div id="content-guidelines-wp-admin-app" class="boot-layout-container"></div>
+	<div id="guidelines-app" class="boot-layout-container"></div>
 	<?php
 }
 
