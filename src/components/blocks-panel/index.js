@@ -45,6 +45,11 @@ const PRIORITY_BLOCKS = [
 ];
 
 /**
+ * Number of blocks to show per page.
+ */
+const BLOCKS_PER_PAGE = 20;
+
+/**
  * Block card component.
  *
  * @param {Object}   props              Component props.
@@ -144,6 +149,40 @@ function BlockDetailScreen( { block, onBack } ) {
 		return null;
 	}
 
+	// Render block icon from REST API data
+	const renderBlockIcon = () => {
+		if ( ! block.icon ) {
+			return null;
+		}
+
+		// Icon can be a string (dashicon), an object with src (SVG), or an SVG string
+		if ( typeof block.icon === 'string' ) {
+			if ( block.icon.startsWith( '<svg' ) ) {
+				return (
+					<span
+						className="blocks-panel__block-icon"
+						dangerouslySetInnerHTML={ { __html: block.icon } }
+					/>
+				);
+			}
+			// Dashicon
+			return <span className={ `dashicons dashicons-${ block.icon } blocks-panel__block-icon` } />;
+		}
+
+		if ( block.icon?.src ) {
+			if ( typeof block.icon.src === 'string' && block.icon.src.startsWith( '<svg' ) ) {
+				return (
+					<span
+						className="blocks-panel__block-icon"
+						dangerouslySetInnerHTML={ { __html: block.icon.src } }
+					/>
+				);
+			}
+		}
+
+		return null;
+	};
+
 	return (
 		<div className="blocks-panel__detail-container">
 			<Flex justify="flex-start">
@@ -164,45 +203,53 @@ function BlockDetailScreen( { block, onBack } ) {
 
 			<Spacer margin={ 4 } />
 
-			<Text>
-				{ __( 'Set AI guidelines specific to this block type.', 'content-guidelines' ) }
-			</Text>
+			<div className="blocks-panel__block-preview">
+				{ renderBlockIcon() }
+				<div className="blocks-panel__block-info">
+					<Text className="blocks-panel__block-name">{ block.name }</Text>
+					{ block.description && (
+						<Text variant="muted" className="blocks-panel__block-description">
+							{ block.description }
+						</Text>
+					) }
+				</div>
+			</div>
 
 			<Spacer margin={ 4 } />
 
-			<VStack spacing={ 6 }>
-				{ /* Copy Rules */ }
-				<VStack spacing={ 3 }>
-					<Heading level={ 3 } className="blocks-panel__section-title">
+			<VStack spacing={ 4 }>
+				<div className="blocks-panel__divider">
+					<span className="blocks-panel__divider-text">
 						{ __( 'Copy Rules', 'content-guidelines' ) }
-					</Heading>
-					<RepeaterControl
-						label={ __( 'Do', 'content-guidelines' ) }
-						items={ blockGuidelines.copy_rules?.dos || [] }
-						onChange={ ( value ) => updateNestedField( 'copy_rules', 'dos', value ) }
-						placeholder={ __( 'Add a rule…', 'content-guidelines' ) }
-					/>
-					<RepeaterControl
-						label={ __( "Don't", 'content-guidelines' ) }
-						items={ blockGuidelines.copy_rules?.donts || [] }
-						onChange={ ( value ) => updateNestedField( 'copy_rules', 'donts', value ) }
-						placeholder={ __( 'Add a rule…', 'content-guidelines' ) }
-					/>
-				</VStack>
+					</span>
+				</div>
 
-				{ /* Notes */ }
-				<VStack spacing={ 3 }>
-					<Heading level={ 3 } className="blocks-panel__section-title">
-						{ __( 'Additional Notes', 'content-guidelines' ) }
-					</Heading>
-					<TextareaControl
-						__nextHasNoMarginBottom
-						value={ blockGuidelines.notes || '' }
-						onChange={ ( value ) => updateField( 'notes', value ) }
-						placeholder={ __( 'Any other guidelines for this block…', 'content-guidelines' ) }
-						rows={ 3 }
-					/>
-				</VStack>
+				<RepeaterControl
+					label={ __( 'Do', 'content-guidelines' ) }
+					items={ blockGuidelines.copy_rules?.dos || [] }
+					onChange={ ( value ) => updateNestedField( 'copy_rules', 'dos', value ) }
+					placeholder={ __( 'Add a rule…', 'content-guidelines' ) }
+				/>
+				<RepeaterControl
+					label={ __( "Don't", 'content-guidelines' ) }
+					items={ blockGuidelines.copy_rules?.donts || [] }
+					onChange={ ( value ) => updateNestedField( 'copy_rules', 'donts', value ) }
+					placeholder={ __( 'Add a rule…', 'content-guidelines' ) }
+				/>
+
+				<div className="blocks-panel__divider">
+					<span className="blocks-panel__divider-text">
+						{ __( 'Notes', 'content-guidelines' ) }
+					</span>
+				</div>
+
+				<TextareaControl
+					__nextHasNoMarginBottom
+					value={ blockGuidelines.notes || '' }
+					onChange={ ( value ) => updateField( 'notes', value ) }
+					placeholder={ __( 'Any other guidelines for this block…', 'content-guidelines' ) }
+					rows={ 3 }
+				/>
 			</VStack>
 		</div>
 	);
@@ -211,14 +258,19 @@ function BlockDetailScreen( { block, onBack } ) {
 /**
  * Blocks panel component with Navigator drill-down.
  *
+ * @param {Object}   props               Component props.
+ * @param {string}   props.initialBlock  Initial block name from URL.
+ * @param {Function} props.onBlockChange Callback when block changes.
  * @return {JSX.Element} Blocks panel.
  */
-export default function BlocksPanel() {
+export default function BlocksPanel( { initialBlock, onBlockChange } ) {
 	const [ searchTerm, setSearchTerm ] = useState( '' );
 	const [ selectedBlock, setSelectedBlock ] = useState( null );
+	const [ pendingBlockName, setPendingBlockName ] = useState( initialBlock );
 	const [ blockTypes, setBlockTypes ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
+	const [ currentPage, setCurrentPage ] = useState( 1 );
 
 	// Fetch block types from REST API on mount.
 	// This works on any admin page, unlike the blocks store which
@@ -265,6 +317,33 @@ export default function BlocksPanel() {
 		};
 	}, [] );
 
+	// Set selected block from URL after blocks are loaded.
+	useEffect( () => {
+		if ( pendingBlockName && blockTypes.length > 0 && ! selectedBlock ) {
+			const found = blockTypes.find( ( b ) => b.name === pendingBlockName );
+			if ( found ) {
+				setSelectedBlock( found );
+			}
+			setPendingBlockName( null );
+		}
+	}, [ pendingBlockName, blockTypes, selectedBlock ] );
+
+	// Handle block selection with URL callback.
+	const handleBlockSelect = ( block ) => {
+		setSelectedBlock( block );
+		if ( onBlockChange ) {
+			onBlockChange( block.name );
+		}
+	};
+
+	// Handle back navigation with URL callback.
+	const handleBack = () => {
+		setSelectedBlock( null );
+		if ( onBlockChange ) {
+			onBlockChange( null );
+		}
+	};
+
 	const { blockGuidelines } = useSelect( ( select ) => {
 		const draft = select( STORE_NAME ).getDraft();
 		return {
@@ -300,7 +379,12 @@ export default function BlocksPanel() {
 		return blocks;
 	}, [ blockTypes, searchTerm ] );
 
-	const { priorityBlocks, otherBlocks } = useMemo( () => {
+	// Reset page when search changes
+	useEffect( () => {
+		setCurrentPage( 1 );
+	}, [ searchTerm ] );
+
+	const { priorityBlocks, otherBlocks, paginatedOtherBlocks, totalPages } = useMemo( () => {
 		const priority = [];
 		const other = [];
 		filteredBlocks.forEach( ( block ) => {
@@ -310,8 +394,20 @@ export default function BlocksPanel() {
 				other.push( block );
 			}
 		} );
-		return { priorityBlocks: priority, otherBlocks: other };
-	}, [ filteredBlocks ] );
+
+		// Paginate "other" blocks only (priority blocks always show)
+		const startIndex = ( currentPage - 1 ) * BLOCKS_PER_PAGE;
+		const endIndex = startIndex + BLOCKS_PER_PAGE;
+		const paginated = other.slice( startIndex, endIndex );
+		const pages = Math.ceil( other.length / BLOCKS_PER_PAGE );
+
+		return {
+			priorityBlocks: priority,
+			otherBlocks: other,
+			paginatedOtherBlocks: paginated,
+			totalPages: pages,
+		};
+	}, [ filteredBlocks, currentPage ] );
 
 	/**
 	 * Check if a block has meaningful guidelines configured.
@@ -397,7 +493,7 @@ export default function BlocksPanel() {
 												block={ block }
 												variantsText={ getBlockStatus( block.name ) }
 												navigatorPath="/block"
-												onClick={ () => setSelectedBlock( block ) }
+												onClick={ () => handleBlockSelect( block ) }
 											/>
 										</li>
 									) ) }
@@ -409,19 +505,45 @@ export default function BlocksPanel() {
 							<div className="blocks-panel__section">
 								<h2 className="blocks-panel__list-title">
 									{ __( 'All Blocks', 'content-guidelines' ) }
+									<span className="blocks-panel__list-count">
+										{ otherBlocks.length }
+									</span>
 								</h2>
 								<ul role="list" className="blocks-panel__list">
-									{ otherBlocks.map( ( block ) => (
+									{ paginatedOtherBlocks.map( ( block ) => (
 										<li key={ block.name } className="blocks-panel__list-item">
 											<BlockCard
 												block={ block }
 												variantsText={ getBlockStatus( block.name ) }
 												navigatorPath="/block"
-												onClick={ () => setSelectedBlock( block ) }
+												onClick={ () => handleBlockSelect( block ) }
 											/>
 										</li>
 									) ) }
 								</ul>
+								{ totalPages > 1 && (
+									<div className="blocks-panel__pagination">
+										<Button
+											variant="secondary"
+											size="small"
+											disabled={ currentPage === 1 }
+											onClick={ () => setCurrentPage( currentPage - 1 ) }
+										>
+											{ __( 'Previous', 'content-guidelines' ) }
+										</Button>
+										<span className="blocks-panel__pagination-info">
+											{ currentPage } / { totalPages }
+										</span>
+										<Button
+											variant="secondary"
+											size="small"
+											disabled={ currentPage === totalPages }
+											onClick={ () => setCurrentPage( currentPage + 1 ) }
+										>
+											{ __( 'Next', 'content-guidelines' ) }
+										</Button>
+									</div>
+								) }
 							</div>
 						) }
 
@@ -436,7 +558,7 @@ export default function BlocksPanel() {
 				<Navigator.Screen path="/block">
 					<BlockDetailScreen
 						block={ selectedBlock }
-						onBack={ () => setSelectedBlock( null ) }
+						onBack={ handleBack }
 					/>
 				</Navigator.Screen>
 			</Navigator>

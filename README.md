@@ -13,32 +13,51 @@ Site-level editorial guidelines for WordPress. Define voice, tone, copy rules, a
 
 ## Quick Start
 
-### Get Guidelines in PHP
+### Agent Working with a Post (Recommended)
 
 ```php
-// Get a context packet formatted for AI prompts
-$packet = wp_get_content_guidelines_packet( array(
-    'task' => 'writing',  // or 'headline', 'cta', 'image', 'coach'
-) );
+// Get guidelines with automatic block analysis
+// This merges site-level AND block-specific rules for all blocks in the post
+$result = wp_get_content_guidelines_for_post( $post_id );
 
 // Use in your AI prompt
-$prompt = $packet['packet_text'] . "\n\nWrite a headline for: " . $title;
+$prompt = $result['packet_text'] . "\n\nImprove this content:\n" . $post->post_content;
+
+// Also available: list of blocks found and their specific guidelines
+$result['blocks_in_post'];    // ['core/paragraph', 'core/heading', 'core/button']
+$result['block_guidelines'];  // Per-block rules for blocks with custom guidelines
+```
+
+### Get Guidelines for Specific Blocks
+
+```php
+// When you know which blocks you're working with
+$result = wp_get_block_guidelines( array( 'core/button', 'core/heading' ) );
+
+// Returns site_rules + block-specific rules in a ready-to-use packet
+$prompt = $result['packet_text'];
 ```
 
 ### Get Guidelines via REST API
 
 ```bash
-# Get the context packet
+# Get guidelines for a specific post (with block analysis)
 curl -X GET \
-  'https://yoursite.com/wp-json/wp/v2/content-guidelines/packet?task=writing' \
+  'https://yoursite.com/wp-json/wp/v2/content-guidelines/for-post/123' \
+  -H 'Authorization: Basic YOUR_APP_PASSWORD'
+
+# Get guidelines for specific blocks
+curl -X GET \
+  'https://yoursite.com/wp-json/wp/v2/content-guidelines/blocks?blocks=core/button,core/heading' \
   -H 'Authorization: Basic YOUR_APP_PASSWORD'
 ```
 
-### Get Guidelines via Abilities API (WordPress 6.9+)
+### Basic Packet (Without Block Context)
 
 ```php
-$ability = wp_get_ability( 'content-guidelines/get-context-packet' );
-$result = $ability->execute( array( 'task' => 'headline' ) );
+$packet = wp_get_content_guidelines_packet( array(
+    'task' => 'writing',  // or 'headline', 'cta', 'image', 'coach'
+) );
 ```
 
 ## Documentation
@@ -80,6 +99,8 @@ See [Integration Guide](./docs/integration-guide.md) for complete examples.
 
 ## Data Schema
 
+The schema follows the `theme.json` pattern used in WordPress core:
+
 ```json
 {
   "version": 1,
@@ -107,7 +128,22 @@ See [Integration Guide](./docs/integration-guide.md) for complete examples.
     "donts": ["Stock photos"],
     "text_policy": "never"
   },
-  "notes": "Additional context..."
+  "notes": "Additional context...",
+  "blocks": {
+    "core/paragraph": {
+      "copy_rules": {
+        "dos": ["Limit paragraphs to 3-4 sentences"],
+        "donts": ["Don't start with 'In this article'"]
+      },
+      "notes": "Keep paragraphs scannable"
+    },
+    "core/button": {
+      "copy_rules": {
+        "dos": ["Use action verbs", "Keep under 5 words"],
+        "donts": ["Don't use 'Click here'", "Avoid 'Submit'"]
+      }
+    }
+  }
 }
 ```
 

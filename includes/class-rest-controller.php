@@ -137,23 +137,28 @@ class REST_Controller {
 					'callback'            => array( __CLASS__, 'get_packet' ),
 					'permission_callback' => array( __CLASS__, 'can_view' ),
 					'args'                => array(
-						'task'      => array(
+						'task'       => array(
 							'type'    => 'string',
 							'default' => 'writing',
 							'enum'    => array( 'writing', 'headline', 'cta', 'image', 'coach' ),
 						),
-						'post_id'   => array(
+						'post_id'    => array(
 							'type'              => 'integer',
 							'sanitize_callback' => 'absint',
 						),
-						'use'       => array(
+						'use'        => array(
 							'type'    => 'string',
 							'default' => 'active',
 							'enum'    => array( 'active', 'draft' ),
 						),
-						'max_chars' => array(
+						'max_chars'  => array(
 							'type'    => 'integer',
 							'default' => 2000,
+						),
+						'block_name' => array(
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+							'description'       => 'Block name for block-specific guidelines (e.g., core/paragraph).',
 						),
 					),
 				),
@@ -197,6 +202,74 @@ class REST_Controller {
 				),
 			)
 		);
+
+		// Get guidelines for a specific post (with block analysis).
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/' . self::REST_BASE . '/for-post/(?P<post_id>[\d]+)',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( __CLASS__, 'get_post_guidelines' ),
+					'permission_callback' => array( __CLASS__, 'can_view' ),
+					'args'                => array(
+						'post_id' => array(
+							'required'          => true,
+							'type'              => 'integer',
+							'sanitize_callback' => 'absint',
+							'description'       => 'The post ID to get guidelines for.',
+						),
+						'task'    => array(
+							'type'    => 'string',
+							'default' => 'writing',
+							'enum'    => array( 'writing', 'headline', 'cta', 'image', 'coach' ),
+						),
+						'use'     => array(
+							'type'    => 'string',
+							'default' => 'active',
+							'enum'    => array( 'active', 'draft' ),
+						),
+					),
+				),
+			)
+		);
+
+		// Get guidelines for multiple blocks (batch endpoint).
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/' . self::REST_BASE . '/blocks',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( __CLASS__, 'get_blocks_guidelines' ),
+					'permission_callback' => array( __CLASS__, 'can_view' ),
+					'args'                => array(
+						'blocks' => array(
+							'required'          => true,
+							'type'              => 'array',
+							'items'             => array( 'type' => 'string' ),
+							'description'       => 'Array of block names to get guidelines for.',
+							'sanitize_callback' => function ( $value ) {
+								if ( is_string( $value ) ) {
+									$value = explode( ',', $value );
+								}
+								return array_map( 'sanitize_text_field', (array) $value );
+							},
+						),
+						'task'   => array(
+							'type'    => 'string',
+							'default' => 'writing',
+							'enum'    => array( 'writing', 'headline', 'cta', 'image', 'coach' ),
+						),
+						'use'    => array(
+							'type'    => 'string',
+							'default' => 'active',
+							'enum'    => array( 'active', 'draft' ),
+						),
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -234,7 +307,7 @@ class REST_Controller {
 			'has_draft'      => ! empty( $draft ),
 			'post_id'        => $post ? $post->ID : null,
 			'updated_at'     => $post ? $post->post_modified_gmt : null,
-			'revision_count' => $post ? count( wp_get_post_revisions( $post->ID ) ) : 0,
+			'revision_count' => $post ? count( wp_get_post_revisions( $post->ID, array( 'check_enabled' => false ) ) ) : 0,
 		);
 
 		return rest_ensure_response( $response );
@@ -317,8 +390,9 @@ class REST_Controller {
 		$revisions = wp_get_post_revisions(
 			$post->ID,
 			array(
-				'order'   => 'DESC',
-				'orderby' => 'date',
+				'order'         => 'DESC',
+				'orderby'       => 'date',
+				'check_enabled' => false, // Bypass WP_POST_REVISIONS check - we support revisions via post_type_supports.
 			)
 		);
 
@@ -375,10 +449,11 @@ class REST_Controller {
 	public static function get_packet( $request ) {
 		$packet = Context_Packet_Builder::get_packet(
 			array(
-				'task'      => $request->get_param( 'task' ),
-				'post_id'   => $request->get_param( 'post_id' ),
-				'use'       => $request->get_param( 'use' ),
-				'max_chars' => $request->get_param( 'max_chars' ),
+				'task'       => $request->get_param( 'task' ),
+				'post_id'    => $request->get_param( 'post_id' ),
+				'use'        => $request->get_param( 'use' ),
+				'max_chars'  => $request->get_param( 'max_chars' ),
+				'block_name' => $request->get_param( 'block_name' ),
 			)
 		);
 
@@ -551,5 +626,60 @@ class REST_Controller {
 		);
 
 		return isset( $map[ $playground_task ] ) ? $map[ $playground_task ] : 'writing';
+	}
+
+	/**
+	 * Get guidelines for a specific post with block analysis.
+	 *
+	 * Analyzes the blocks in a post and returns a context packet with
+	 * both site-level and block-specific guidelines merged.
+	 *
+	 * @param \WP_REST_Request $request The request object.
+	 * @return \WP_REST_Response|\WP_Error Response or error.
+	 */
+	public static function get_post_guidelines( $request ) {
+		$post_id = $request->get_param( 'post_id' );
+		$post    = get_post( $post_id );
+
+		if ( ! $post ) {
+			return new \WP_Error(
+				'invalid_post',
+				__( 'Post not found.', 'content-guidelines' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$result = \ContentGuidelines\get_content_guidelines_for_post(
+			$post,
+			array(
+				'task' => $request->get_param( 'task' ),
+				'use'  => $request->get_param( 'use' ),
+			)
+		);
+
+		return rest_ensure_response( $result );
+	}
+
+	/**
+	 * Get guidelines for multiple blocks (batch endpoint).
+	 *
+	 * Returns site-level and block-specific guidelines for the requested
+	 * block types. Useful for agents working with specific blocks.
+	 *
+	 * @param \WP_REST_Request $request The request object.
+	 * @return \WP_REST_Response Response.
+	 */
+	public static function get_blocks_guidelines( $request ) {
+		$block_names = $request->get_param( 'blocks' );
+
+		$result = \ContentGuidelines\get_block_guidelines(
+			$block_names,
+			array(
+				'task' => $request->get_param( 'task' ),
+				'use'  => $request->get_param( 'use' ),
+			)
+		);
+
+		return rest_ensure_response( $result );
 	}
 }

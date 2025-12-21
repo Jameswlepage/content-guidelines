@@ -261,7 +261,7 @@ export function publishDraft() {
  * @return {Function} Thunk action.
  */
 export function discardDraft() {
-	return async ( { dispatch } ) => {
+	return async ( { dispatch, select } ) => {
 		dispatch.setError( null );
 
 		try {
@@ -270,7 +270,13 @@ export function discardDraft() {
 				method: 'POST',
 			} );
 
-			dispatch.setDraft( null );
+			// Reset draft to active guidelines
+			const active = select.getActive();
+			if ( active ) {
+				dispatch.setDraft( { ...active } );
+			} else {
+				dispatch.setDraft( null );
+			}
 		} catch ( error ) {
 			dispatch.setError( error.message || 'Failed to discard draft.' );
 		}

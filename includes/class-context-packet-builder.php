@@ -37,21 +37,23 @@ class Context_Packet_Builder {
 	 * @param array $args {
 	 *     Arguments for building the packet.
 	 *
-	 *     @type string $task      Task type. Default 'writing'.
-	 *     @type int    $post_id   Optional context post ID.
-	 *     @type string $use       Which version: 'active' or 'draft'. Default 'active'.
-	 *     @type int    $max_chars Maximum characters. Default 2000.
-	 *     @type string $locale    Optional locale.
+	 *     @type string $task       Task type. Default 'writing'.
+	 *     @type int    $post_id    Optional context post ID.
+	 *     @type string $use        Which version: 'active' or 'draft'. Default 'active'.
+	 *     @type int    $max_chars  Maximum characters. Default 2000.
+	 *     @type string $locale     Optional locale.
+	 *     @type string $block_name Optional block name for block-specific guidelines.
 	 * }
 	 * @return array The context packet.
 	 */
 	public static function get_packet( $args = array() ) {
 		$defaults = array(
-			'task'      => 'writing',
-			'post_id'   => null,
-			'use'       => 'active',
-			'max_chars' => 2000,
-			'locale'    => get_locale(),
+			'task'       => 'writing',
+			'post_id'    => null,
+			'use'        => 'active',
+			'max_chars'  => 2000,
+			'locale'     => get_locale(),
+			'block_name' => null,
 		);
 
 		$args       = wp_parse_args( $args, $defaults );
@@ -71,13 +73,18 @@ class Context_Packet_Builder {
 		// Get task-relevant subset of guidelines.
 		$relevant = self::get_task_relevant_sections( $guidelines, $args['task'] );
 
+		// Merge block-specific guidelines if a block name is provided.
+		if ( ! empty( $args['block_name'] ) ) {
+			$relevant = self::merge_block_guidelines( $relevant, $guidelines, $args['block_name'] );
+		}
+
 		// Build text packet.
-		$packet_text = self::build_text_packet( $relevant, $args['task'], $args['max_chars'] );
+		$packet_text = self::build_text_packet( $relevant, $args['task'], $args['max_chars'], $args['block_name'] );
 
 		// Get revision info.
 		$revision_id = null;
 		if ( $post ) {
-			$revisions = wp_get_post_revisions( $post->ID, array( 'posts_per_page' => 1 ) );
+			$revisions = wp_get_post_revisions( $post->ID, array( 'posts_per_page' => 1, 'check_enabled' => false ) );
 			if ( ! empty( $revisions ) ) {
 				$revision_id = current( $revisions )->ID;
 			}
@@ -123,16 +130,71 @@ class Context_Packet_Builder {
 	}
 
 	/**
+	 * Merge block-specific guidelines into the relevant sections.
+	 *
+	 * Block-specific copy rules are appended to site-level copy rules.
+	 * Block-specific notes are added as a separate section.
+	 *
+	 * @param array  $relevant   The task-relevant sections.
+	 * @param array  $guidelines Full guidelines data.
+	 * @param string $block_name The block name (e.g., 'core/paragraph').
+	 * @return array Merged sections with block-specific guidelines.
+	 */
+	private static function merge_block_guidelines( $relevant, $guidelines, $block_name ) {
+		if ( empty( $guidelines['blocks'][ $block_name ] ) ) {
+			return $relevant;
+		}
+
+		$block_guidelines = $guidelines['blocks'][ $block_name ];
+
+		// Merge block-specific copy rules with site-level rules.
+		if ( ! empty( $block_guidelines['copy_rules'] ) ) {
+			if ( ! isset( $relevant['copy_rules'] ) ) {
+				$relevant['copy_rules'] = array();
+			}
+
+			// Append block-specific dos.
+			if ( ! empty( $block_guidelines['copy_rules']['dos'] ) ) {
+				$existing_dos = isset( $relevant['copy_rules']['dos'] ) ? $relevant['copy_rules']['dos'] : array();
+				$relevant['copy_rules']['dos'] = array_merge( $existing_dos, $block_guidelines['copy_rules']['dos'] );
+			}
+
+			// Append block-specific donts.
+			if ( ! empty( $block_guidelines['copy_rules']['donts'] ) ) {
+				$existing_donts = isset( $relevant['copy_rules']['donts'] ) ? $relevant['copy_rules']['donts'] : array();
+				$relevant['copy_rules']['donts'] = array_merge( $existing_donts, $block_guidelines['copy_rules']['donts'] );
+			}
+		}
+
+		// Add block-specific notes.
+		if ( ! empty( $block_guidelines['notes'] ) ) {
+			$relevant['block_notes'] = $block_guidelines['notes'];
+		}
+
+		// Store block name for text packet generation.
+		$relevant['_block_name'] = $block_name;
+
+		return $relevant;
+	}
+
+	/**
 	 * Build a text-based packet for LLM consumption.
 	 *
-	 * @param array  $relevant  Relevant guidelines sections.
-	 * @param string $task      The task type.
-	 * @param int    $max_chars Maximum characters.
+	 * @param array       $relevant   Relevant guidelines sections.
+	 * @param string      $task       The task type.
+	 * @param int         $max_chars  Maximum characters.
+	 * @param string|null $block_name Optional block name for context.
 	 * @return string The formatted packet text.
 	 */
-	private static function build_text_packet( $relevant, $task, $max_chars ) {
+	private static function build_text_packet( $relevant, $task, $max_chars, $block_name = null ) {
 		$lines = array();
 		$lines[] = '## SITE CONTENT GUIDELINES';
+
+		// Add block context if provided.
+		if ( $block_name ) {
+			$lines[] = sprintf( '(Context: %s block)', $block_name );
+		}
+
 		$lines[] = '';
 
 		// Brand context.
@@ -299,6 +361,14 @@ class Context_Packet_Builder {
 			$lines[] = '### Additional Notes';
 			$lines[] = $relevant['notes'];
 			$lines[] = '';
+		}
+
+		// Block-specific notes.
+		if ( ! empty( $relevant['block_notes'] ) ) {
+			$block_label = isset( $relevant['_block_name'] ) ? $relevant['_block_name'] : 'Block';
+			$lines[]     = sprintf( '### %s Notes', $block_label );
+			$lines[]     = $relevant['block_notes'];
+			$lines[]     = '';
 		}
 
 		$packet = implode( "\n", $lines );

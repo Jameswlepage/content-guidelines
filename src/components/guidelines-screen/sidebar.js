@@ -2,13 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { TabPanel, Notice } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { TabPanel } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from '../../store';
 import BrandContextPanel from '../panels/brand-context';
 import VoiceTonePanel from '../panels/voice-tone';
 import CopyRulesPanel from '../panels/copy-rules';
@@ -27,13 +25,6 @@ import EmptyState from './empty-state';
  * @return {JSX.Element} Sidebar component.
  */
 export default function Sidebar( { fixturePostId, hasGuidelines } ) {
-	const { hasDraft, draftHasChanges } = useSelect( ( select ) => {
-		return {
-			hasDraft: select( STORE_NAME ).hasDraft(),
-			draftHasChanges: select( STORE_NAME ).draftHasChanges(),
-		};
-	}, [] );
-
 	const tabs = [
 		{
 			name: 'guidelines',
@@ -56,18 +47,6 @@ export default function Sidebar( { fixturePostId, hasGuidelines } ) {
 
 						return (
 							<div className="content-guidelines-sidebar__panels">
-								{ hasDraft && draftHasChanges && (
-									<Notice
-										status="warning"
-										isDismissible={ false }
-									>
-										{ __(
-											'Draft changes not published.',
-											'content-guidelines'
-										) }
-									</Notice>
-								) }
-
 								<BrandContextPanel />
 								<VoiceTonePanel />
 								<CopyRulesPanel />

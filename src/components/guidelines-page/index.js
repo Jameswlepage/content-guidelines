@@ -98,18 +98,56 @@ function HeaderActions( { hasDraft, isSaving, isPublishing, error, onClearError,
 }
 
 /**
+ * Get URL params for navigation state.
+ *
+ * @return {Object} URL params.
+ */
+function getUrlParams() {
+	const params = new URLSearchParams( window.location.search );
+	return {
+		tab: params.get( 'tab' ) || 'library',
+		section: params.get( 'section' ) || null,
+		block: params.get( 'block' ) || null,
+	};
+}
+
+/**
+ * Update URL with navigation state.
+ *
+ * @param {Object} updates Params to update.
+ */
+function updateUrl( updates ) {
+	const url = new URL( window.location.href );
+
+	Object.entries( updates ).forEach( ( [ key, value ] ) => {
+		if ( value ) {
+			url.searchParams.set( key, value );
+		} else {
+			url.searchParams.delete( key );
+		}
+	} );
+
+	window.history.replaceState( {}, '', url );
+}
+
+/**
  * Main guidelines page component using @wordpress/admin-ui Page wrapper.
  *
  * @return {JSX.Element} The guidelines page.
  */
 export default function GuidelinesPage() {
 	const [ showHistory, setShowHistory ] = useState( false );
-	const [ activeTab, setActiveTab ] = useState( 'library' );
+
+	// Initialize from URL params.
+	const initialParams = getUrlParams();
+	const [ activeTab, setActiveTab ] = useState( initialParams.tab );
+	const [ urlSection, setUrlSection ] = useState( initialParams.section );
+	const [ urlBlock, setUrlBlock ] = useState( initialParams.block );
 
 	const {
 		active,
 		draft,
-		hasDraft,
+		hasDraftChanges,
 		hasGuidelines,
 		isSaving,
 		isPublishing,
@@ -119,7 +157,7 @@ export default function GuidelinesPage() {
 		return {
 			active: store.getActive(),
 			draft: store.getDraft(),
-			hasDraft: store.hasDraft(),
+			hasDraftChanges: store.draftHasChanges(),
 			hasGuidelines: store.hasGuidelines(),
 			isSaving: store.isSaving(),
 			isPublishing: store.isPublishing(),
@@ -127,7 +165,45 @@ export default function GuidelinesPage() {
 		};
 	}, [] );
 
-	const { initializeEditor, setError: clearError } = useDispatch( STORE_NAME );
+	const { initializeEditor, setError: clearError, saveDraft } = useDispatch( STORE_NAME );
+
+	// Handle tab changes with URL sync.
+	const handleTabChange = ( tab ) => {
+		setActiveTab( tab );
+		// Clear section/block when changing tabs.
+		setUrlSection( null );
+		setUrlBlock( null );
+		updateUrl( { tab, section: null, block: null } );
+	};
+
+	// Handle section changes from LibraryPanel.
+	const handleSectionChange = ( section ) => {
+		setUrlSection( section );
+		updateUrl( { section } );
+	};
+
+	// Handle block changes from BlocksPanel.
+	const handleBlockChange = ( block ) => {
+		setUrlBlock( block );
+		updateUrl( { block } );
+	};
+
+	// Keyboard shortcut: Ctrl+S / Cmd+S to save draft.
+	useEffect( () => {
+		const handleKeyDown = ( event ) => {
+			if ( ( event.ctrlKey || event.metaKey ) && event.key === 's' ) {
+				event.preventDefault();
+				if ( hasDraftChanges && ! isSaving && ! isPublishing ) {
+					saveDraft();
+				}
+			}
+		};
+
+		document.addEventListener( 'keydown', handleKeyDown );
+		return () => {
+			document.removeEventListener( 'keydown', handleKeyDown );
+		};
+	}, [ hasDraftChanges, isSaving, isPublishing, saveDraft ] );
 
 	// Initialize editor when guidelines load.
 	useEffect( () => {
@@ -151,7 +227,7 @@ export default function GuidelinesPage() {
 	}
 
 	// Empty state - no guidelines yet.
-	if ( ! hasGuidelines && ! hasDraft ) {
+	if ( ! hasGuidelines ) {
 		return (
 			<Page title={ __( 'Guidelines', 'content-guidelines' ) }>
 				<EmptyState />
@@ -174,7 +250,7 @@ export default function GuidelinesPage() {
 			title={ __( 'Guidelines', 'content-guidelines' ) }
 			actions={
 				<HeaderActions
-					hasDraft={ hasDraft }
+					hasDraft={ hasDraftChanges }
 					isSaving={ isSaving }
 					isPublishing={ isPublishing }
 					error={ error }
@@ -192,7 +268,7 @@ export default function GuidelinesPage() {
 								role="tab"
 								aria-selected={ activeTab === tab.name }
 								className={ `guidelines-page__tab ${ activeTab === tab.name ? 'is-active' : '' }` }
-								onClick={ () => setActiveTab( tab.name ) }
+								onClick={ () => handleTabChange( tab.name ) }
 							>
 								{ tab.title }
 							</button>
@@ -205,7 +281,7 @@ export default function GuidelinesPage() {
 								role="tab"
 								aria-selected={ activeTab === tab.name }
 								className={ `guidelines-page__tab ${ activeTab === tab.name ? 'is-active' : '' }` }
-								onClick={ () => setActiveTab( tab.name ) }
+								onClick={ () => handleTabChange( tab.name ) }
 							>
 								{ tab.title }
 							</button>
@@ -214,8 +290,18 @@ export default function GuidelinesPage() {
 				</div>
 
 				<div className="guidelines-page__tab-panel" role="tabpanel">
-					{ activeTab === 'library' && <LibraryPanel /> }
-					{ activeTab === 'blocks' && <BlocksPanel /> }
+					{ activeTab === 'library' && (
+						<LibraryPanel
+							initialSection={ urlSection }
+							onSectionChange={ handleSectionChange }
+						/>
+					) }
+					{ activeTab === 'blocks' && (
+						<BlocksPanel
+							initialBlock={ urlBlock }
+							onBlockChange={ handleBlockChange }
+						/>
+					) }
 					{ activeTab === 'playground' && <PlaygroundPanel /> }
 					{ activeTab === 'import-export' && <ImportExportPanel /> }
 				</div>

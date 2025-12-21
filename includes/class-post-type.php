@@ -35,6 +35,23 @@ class Post_Type {
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'register_post_type' ) );
 		add_action( 'init', array( __CLASS__, 'register_post_meta' ) );
+
+		// Ensure revisions are always enabled for our post type, regardless of WP_POST_REVISIONS.
+		add_filter( 'wp_' . self::POST_TYPE . '_revisions_to_keep', array( __CLASS__, 'enable_revisions' ) );
+	}
+
+	/**
+	 * Force revisions to be enabled for this post type.
+	 *
+	 * This ensures revisions work even if WP_POST_REVISIONS is disabled globally.
+	 *
+	 * @param int $num Number of revisions to keep.
+	 * @return int Number of revisions to keep (-1 for unlimited).
+	 */
+	public static function enable_revisions( $num ) {
+		// If revisions are disabled (0), enable unlimited revisions for our post type.
+		// Otherwise respect the site's setting.
+		return 0 === $num ? -1 : $num;
 	}
 
 	/**
@@ -228,6 +245,28 @@ class Post_Type {
 				'notes'         => array(
 					'type' => 'string',
 				),
+				'blocks'        => array(
+					'type'                 => 'object',
+					'additionalProperties' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'copy_rules' => array(
+								'type'       => 'object',
+								'properties' => array(
+									'dos'   => array(
+										'type'  => 'array',
+										'items' => array( 'type' => 'string' ),
+									),
+									'donts' => array(
+										'type'  => 'array',
+										'items' => array( 'type' => 'string' ),
+									),
+								),
+							),
+							'notes'      => array( 'type' => 'string' ),
+						),
+					),
+				),
 			),
 		);
 	}
@@ -353,6 +392,7 @@ class Post_Type {
 				'text_policy' => '',
 			),
 			'notes'         => '',
+			'blocks'        => array(),
 		);
 
 		return array_replace_recursive( $defaults, $overrides );

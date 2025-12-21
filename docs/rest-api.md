@@ -126,11 +126,12 @@ Get a task-specific context packet for AI consumption.
 | `post_id` | integer | - | Optional context post ID |
 | `use` | string | `active` | Guidelines version: `active` or `draft` |
 | `max_chars` | integer | `2000` | Maximum characters for packet_text |
+| `block_name` | string | - | Optional: include block-specific rules (e.g., `core/button`) |
 
 **Example Request:**
 
 ```
-GET /wp-json/wp/v2/content-guidelines/packet?task=headline&max_chars=1000
+GET /wp-json/wp/v2/content-guidelines/packet?task=cta&block_name=core/button
 ```
 
 **Response:**
@@ -156,6 +157,109 @@ GET /wp-json/wp/v2/content-guidelines/packet?task=headline&max_chars=1000
   "guidelines_id": 123,
   "revision_id": 456,
   "updated_at": "2025-01-15T10:30:00"
+}
+```
+
+### GET /content-guidelines/for-post/{post_id}
+
+**Primary endpoint for agents working with post content.** Analyzes the blocks in a post and returns guidelines with block-specific rules merged.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `post_id` | integer | The post ID to analyze |
+
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `task` | string | `writing` | Task type |
+| `use` | string | `active` | Guidelines version: `active` or `draft` |
+
+**Example Request:**
+
+```
+GET /wp-json/wp/v2/content-guidelines/for-post/123?task=writing
+```
+
+**Response:**
+
+```json
+{
+  "packet_text": "## SITE CONTENT GUIDELINES\n\nAbout this site: ...\n\n### Block-Specific Rules\n\n**core/button:**\nDO:\n- Use action verbs\n...",
+  "packet_structured": {
+    "brand_context": { ... },
+    "voice_tone": { ... }
+  },
+  "blocks_in_post": [
+    "core/paragraph",
+    "core/heading",
+    "core/image",
+    "core/button"
+  ],
+  "block_guidelines": {
+    "core/button": {
+      "copy_rules": {
+        "dos": ["Use action verbs", "Keep under 5 words"],
+        "donts": ["Don't use 'Click here'"]
+      },
+      "notes": "Button text should create urgency"
+    }
+  },
+  "guidelines_id": 42,
+  "updated_at": "2025-01-15T10:30:00"
+}
+```
+
+### GET /content-guidelines/blocks
+
+Get guidelines for multiple block types in a single request.
+
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `blocks` | array | required | Block names (array or comma-separated) |
+| `task` | string | `writing` | Task type |
+| `use` | string | `active` | Guidelines version: `active` or `draft` |
+
+**Example Requests:**
+
+```
+# Array syntax
+GET /wp-json/wp/v2/content-guidelines/blocks?blocks[]=core/heading&blocks[]=core/button
+
+# Comma-separated
+GET /wp-json/wp/v2/content-guidelines/blocks?blocks=core/heading,core/paragraph,core/button
+```
+
+**Response:**
+
+```json
+{
+  "site_rules": {
+    "dos": ["Use active voice", "Keep sentences short"],
+    "donts": ["Avoid jargon", "Don't use passive voice"]
+  },
+  "blocks": {
+    "core/heading": null,
+    "core/paragraph": {
+      "copy_rules": {
+        "dos": ["Limit to 3-4 sentences"],
+        "donts": ["Don't start with 'In this article'"]
+      }
+    },
+    "core/button": {
+      "copy_rules": {
+        "dos": ["Use action verbs"],
+        "donts": ["Don't use 'Click here'"]
+      },
+      "notes": "Keep CTA text under 5 words"
+    }
+  },
+  "packet_text": "## CONTENT GUIDELINES\n\n### Site Rules\nDO:\n- Use active voice\n...",
+  "guidelines_id": 42
 }
 ```
 
