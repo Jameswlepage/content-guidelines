@@ -164,8 +164,6 @@
 	flex: 1;
 	min-height: 0; // Allow shrinking within flex container
 	overflow-y: auto; // Scrollable area for tab content
-	display: flex;
-	flex-direction: column;
 	border: none;
 	padding: 0;
 }

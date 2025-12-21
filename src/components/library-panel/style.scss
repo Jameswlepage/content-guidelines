@@ -1,10 +1,6 @@
 // Library panel styles - matching fonts library pattern
 
 .library-panel {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-	min-height: 0;
 }
 
 // Draft notice
@@ -83,13 +79,6 @@
 }
 
 // Navigator screens
-.library-panel .components-navigator-provider {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-	min-height: 0;
-}
-
 .library-panel .components-navigator-screen {
 	padding: 24px;
 	width: 100%;

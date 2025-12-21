@@ -144,6 +144,10 @@ export default function GuidelinesPage() {
 	const [ urlSection, setUrlSection ] = useState( initialParams.section );
 	const [ urlBlock, setUrlBlock ] = useState( initialParams.block );
 
+	// Keys to force panel remount when clicking tab while drilled down.
+	const [ libraryKey, setLibraryKey ] = useState( 0 );
+	const [ blocksKey, setBlocksKey ] = useState( 0 );
+
 	const {
 		active,
 		draft,
@@ -169,6 +173,14 @@ export default function GuidelinesPage() {
 
 	// Handle tab changes with URL sync.
 	const handleTabChange = ( tab ) => {
+		// If clicking the same tab while drilled down, reset to root view.
+		if ( tab === activeTab ) {
+			if ( tab === 'library' && urlSection ) {
+				setLibraryKey( ( k ) => k + 1 );
+			} else if ( tab === 'blocks' && urlBlock ) {
+				setBlocksKey( ( k ) => k + 1 );
+			}
+		}
 		setActiveTab( tab );
 		// Clear section/block when changing tabs.
 		setUrlSection( null );
@@ -292,12 +304,14 @@ export default function GuidelinesPage() {
 				<div className="guidelines-page__tab-panel" role="tabpanel">
 					{ activeTab === 'library' && (
 						<LibraryPanel
+							key={ libraryKey }
 							initialSection={ urlSection }
 							onSectionChange={ handleSectionChange }
 						/>
 					) }
 					{ activeTab === 'blocks' && (
 						<BlocksPanel
+							key={ blocksKey }
 							initialBlock={ urlBlock }
 							onBlockChange={ handleBlockChange }
 						/>

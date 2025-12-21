@@ -1,10 +1,6 @@
 // Blocks panel styles - matching fonts library pattern
 
 .blocks-panel {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-	min-height: 0;
 }
 
 // Content container - centered with max-width
@@ -113,13 +109,6 @@
 }
 
 // Navigator screens
-.blocks-panel .components-navigator-provider {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-	min-height: 0;
-}
-
 .blocks-panel .components-navigator-screen {
 	padding: 0;
 	width: 100%;
