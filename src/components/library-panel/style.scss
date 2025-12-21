@@ -1,0 +1,135 @@
+// Library panel styles - matching fonts library pattern
+
+.library-panel {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+// Draft notice
+.library-panel__notice {
+	margin: 16px 24px;
+	border-radius: 2px;
+}
+
+// Section list
+.library-panel__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.library-panel__list-item {
+	margin: 0;
+	padding: 0;
+	border-bottom: 1px solid #e0e0e0;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+// Section card button
+.library-panel__section-card {
+	width: 100%;
+	padding: 16px 24px;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	cursor: pointer;
+	text-align: left;
+	min-height: 64px;
+	height: auto;
+
+	&:hover {
+		background: #f8f8f8;
+	}
+
+	&:focus {
+		box-shadow: inset 0 0 0 1.5px var(--wp-admin-theme-color, #3858e9);
+		outline: none;
+	}
+
+	.components-flex {
+		width: 100%;
+	}
+}
+
+.library-panel__section-title {
+	font-size: 14px;
+	font-weight: 500;
+	color: #1e1e1e;
+}
+
+.library-panel__section-description {
+	font-size: 12px;
+	color: #757575;
+}
+
+.library-panel__section-status {
+	font-size: 12px;
+	color: #757575;
+}
+
+// Chevron icon
+.library-panel__section-card svg {
+	fill: #757575;
+	flex-shrink: 0;
+}
+
+// Detail screen
+.library-panel__detail-title {
+	font-size: 13px;
+	font-weight: 500;
+	margin: 0;
+}
+
+// Navigator screens
+.library-panel .components-navigator-provider {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+.library-panel .components-navigator-screen {
+	padding: 0;
+}
+
+// Detail screen layout
+.library-panel .components-navigator-screen:not([data-path="/"]) {
+	padding: 16px 24px;
+}
+
+// Back button area
+.library-panel .components-navigator__back-button {
+	margin-right: 8px;
+}
+
+// Form controls in detail view
+.library-panel .components-textarea-control,
+.library-panel .components-text-control,
+.library-panel .components-select-control {
+	.components-base-control__label {
+		font-size: 12px;
+		font-weight: 500;
+		color: #1e1e1e;
+	}
+
+	.components-base-control__help {
+		font-size: 12px;
+		color: #757575;
+		margin-top: 4px;
+	}
+
+	input,
+	textarea,
+	select {
+		font-size: 13px;
+	}
+}
+
+.library-panel .components-form-token-field__label {
+	font-size: 12px;
+	font-weight: 500;
+	color: #1e1e1e;
+}

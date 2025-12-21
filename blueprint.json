@@ -1,0 +1,23 @@
+{
+    "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+    "landingPage": "/wp-admin/themes.php?page=content-guidelines-wp-admin",
+    "login": true,
+    "steps": [
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/Jeepjamfunk/content-guidelines",
+                "ref": "HEAD",
+                "refType": "refname"
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginZipFile": {
+                "resource": "wordpress.org/plugins",
+                "slug": "gutenberg"
+            }
+        }
+    ]
+}

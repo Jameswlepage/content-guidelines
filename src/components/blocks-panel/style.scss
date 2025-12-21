@@ -1,0 +1,147 @@
+// Blocks panel styles - matching fonts library pattern
+
+.blocks-panel {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+// Search container
+.blocks-panel__search {
+	padding: 16px 24px;
+	border-bottom: 1px solid #e0e0e0;
+
+	.components-search-control {
+		width: 100%;
+	}
+}
+
+// List title (Common, All Blocks)
+.blocks-panel__list-title {
+	font-size: 11px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #757575;
+	margin: 0;
+	padding: 16px 24px 8px;
+}
+
+// Block list
+.blocks-panel__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.blocks-panel__list-item {
+	margin: 0;
+	padding: 0;
+	border-bottom: 1px solid #e0e0e0;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+// Block card button
+.blocks-panel__block-card {
+	width: 100%;
+	padding: 12px 24px;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	cursor: pointer;
+	text-align: left;
+	min-height: 48px;
+
+	&:hover {
+		background: #f8f8f8;
+	}
+
+	&:focus {
+		box-shadow: inset 0 0 0 1.5px var(--wp-admin-theme-color, #3858e9);
+		outline: none;
+	}
+
+	.components-flex {
+		width: 100%;
+	}
+}
+
+.blocks-panel__block-title {
+	font-size: 13px;
+	font-weight: 400;
+	color: #1e1e1e;
+}
+
+.blocks-panel__block-status {
+	font-size: 12px;
+	color: #757575;
+}
+
+// Chevron icon
+.blocks-panel__block-card svg {
+	fill: #757575;
+	flex-shrink: 0;
+}
+
+// Detail screen
+.blocks-panel__detail-title {
+	font-size: 13px;
+	font-weight: 500;
+	margin: 0;
+}
+
+// Section titles in detail view
+.blocks-panel__section-title {
+	font-size: 11px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #757575;
+	margin: 0;
+}
+
+// Navigator screen padding
+.components-navigator-provider {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+.components-navigator-screen {
+	padding: 0;
+}
+
+// Detail screen layout
+.blocks-panel .components-navigator-screen[data-path="/block"] {
+	padding: 16px 24px;
+}
+
+// Back button area
+.blocks-panel .components-navigator__back-button {
+	margin-right: 8px;
+}
+
+// Form controls in detail view
+.blocks-panel .components-textarea-control {
+	.components-base-control__label {
+		font-size: 11px;
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: #757575;
+	}
+
+	textarea {
+		font-size: 13px;
+	}
+}
+
+// Empty state
+.blocks-panel__empty {
+	padding: 24px;
+	text-align: center;
+	color: #757575;
+}
