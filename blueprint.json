@@ -7,7 +7,7 @@
             "step": "installPlugin",
             "pluginData": {
                 "resource": "git:directory",
-                "url": "https://github.com/Jeepjamfunk/content-guidelines",
+                "url": "https://github.com/Jameswlepage/content-guidelines",
                 "ref": "HEAD",
                 "refType": "refname"
             }

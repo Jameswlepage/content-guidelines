@@ -8,44 +8,45 @@
 
 // Draft notice
 .library-panel__notice {
-	margin: 16px 24px;
+	max-width: 640px;
+	margin: 24px auto 0;
 	border-radius: 2px;
 }
 
-// Section list
+// Section list container
 .library-panel__list {
 	list-style: none;
-	margin: 0;
+	margin: 0 auto;
 	padding: 0;
+	max-width: 640px;
 }
 
 .library-panel__list-item {
-	margin: 0;
-	padding: 0;
-	border-bottom: 1px solid #e0e0e0;
+	margin-top: -1px; // Collapse borders with previous element
 
-	&:last-child {
-		border-bottom: none;
+	&:first-child {
+		margin-top: 0;
 	}
 }
 
-// Section card button
+// Section card button - table style with borders
 .library-panel__section-card {
+	box-sizing: border-box;
+	border: 1px solid #e0e0e0;
 	width: 100%;
-	padding: 16px 24px;
-	background: transparent;
-	border: none;
+	height: auto !important;
+	padding: 16px;
+	background: #fff;
 	border-radius: 0;
 	cursor: pointer;
 	text-align: left;
-	min-height: 64px;
-	height: auto;
 
 	&:hover {
 		background: #f8f8f8;
 	}
 
 	&:focus {
+		position: relative;
 		box-shadow: inset 0 0 0 1.5px var(--wp-admin-theme-color, #3858e9);
 		outline: none;
 	}
@@ -57,7 +58,7 @@
 
 .library-panel__section-title {
 	font-size: 14px;
-	font-weight: 500;
+	font-weight: 600;
 	color: #1e1e1e;
 }
 
@@ -77,13 +78,6 @@
 	flex-shrink: 0;
 }
 
-// Detail screen
-.library-panel__detail-title {
-	font-size: 13px;
-	font-weight: 500;
-	margin: 0;
-}
-
 // Navigator screens
 .library-panel .components-navigator-provider {
 	display: flex;
@@ -92,12 +86,22 @@
 }
 
 .library-panel .components-navigator-screen {
-	padding: 0;
+	padding: 24px;
+	width: 100%;
+	box-sizing: border-box;
 }
 
-// Detail screen layout
-.library-panel .components-navigator-screen:not([data-path="/"]) {
-	padding: 16px 24px;
+// Detail screen content container
+.library-panel__detail-container {
+	max-width: 640px;
+	margin: 0 auto;
+}
+
+// Detail screen header
+.library-panel__detail-title {
+	font-size: 13px;
+	font-weight: 500;
+	margin: 0;
 }
 
 // Back button area

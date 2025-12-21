@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	Button,
 	SearchControl,
@@ -17,10 +17,13 @@ import {
 	Flex,
 	FlexItem,
 	TextareaControl,
+	Spinner,
 } from '@wordpress/components';
 import { store as blocksStore } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { isRTL } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -142,7 +145,7 @@ function BlockDetailScreen( { block, onBack } ) {
 	}
 
 	return (
-		<>
+		<div className="blocks-panel__detail-container">
 			<Flex justify="flex-start">
 				<Navigator.BackButton
 					icon={ isRTL() ? chevronRight : chevronLeft }
@@ -201,7 +204,7 @@ function BlockDetailScreen( { block, onBack } ) {
 					/>
 				</VStack>
 			</VStack>
-		</>
+		</div>
 	);
 }
 
@@ -213,10 +216,52 @@ function BlockDetailScreen( { block, onBack } ) {
 export default function BlocksPanel() {
 	const [ searchTerm, setSearchTerm ] = useState( '' );
 	const [ selectedBlock, setSelectedBlock ] = useState( null );
+	const [ blockTypes, setBlockTypes ] = useState( [] );
+	const [ isLoading, setIsLoading ] = useState( true );
+	const [ error, setError ] = useState( null );
 
-	const { blockTypes } = useSelect( ( select ) => {
-		return {
-			blockTypes: select( blocksStore ).getBlockTypes(),
+	// Fetch block types from REST API on mount.
+	// This works on any admin page, unlike the blocks store which
+	// only has blocks when the block editor is loaded.
+	useEffect( () => {
+		let isMounted = true;
+
+		async function fetchBlockTypes() {
+			try {
+				setIsLoading( true );
+				setError( null );
+
+				// Fetch all block types from the REST API.
+				const response = await apiFetch( {
+					path: '/wp/v2/block-types?per_page=100',
+				} );
+
+				if ( isMounted ) {
+					// Transform REST API response to match blocks store format.
+					const blocks = response.map( ( block ) => ( {
+						name: block.name,
+						title: block.title || block.name,
+						description: block.description || '',
+						category: block.category || 'common',
+						icon: block.icon || null,
+						keywords: block.keywords || [],
+					} ) );
+
+					setBlockTypes( blocks );
+					setIsLoading( false );
+				}
+			} catch ( err ) {
+				if ( isMounted ) {
+					setError( err.message || __( 'Failed to load blocks.', 'content-guidelines' ) );
+					setIsLoading( false );
+				}
+			}
+		}
+
+		fetchBlockTypes();
+
+		return () => {
+			isMounted = false;
 		};
 	}, [] );
 
@@ -274,6 +319,39 @@ export default function BlocksPanel() {
 		}
 		return null;
 	};
+
+	// Show loading state.
+	if ( isLoading ) {
+		return (
+			<div className="blocks-panel">
+				<VStack spacing={ 4 } alignment="center">
+					<Spinner />
+					<Text variant="muted">
+						{ __( 'Loading blocks…', 'content-guidelines' ) }
+					</Text>
+				</VStack>
+			</div>
+		);
+	}
+
+	// Show error state.
+	if ( error ) {
+		return (
+			<div className="blocks-panel">
+				<VStack spacing={ 4 }>
+					<Text className="blocks-panel__error">
+						{ error }
+					</Text>
+					<Button
+						variant="secondary"
+						onClick={ () => window.location.reload() }
+					>
+						{ __( 'Retry', 'content-guidelines' ) }
+					</Button>
+				</VStack>
+			</div>
+		);
+	}
 
 	return (
 		<div className="blocks-panel">

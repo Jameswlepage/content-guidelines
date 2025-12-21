@@ -317,7 +317,7 @@ function SectionDetailScreen( { section, onBack } ) {
 	};
 
 	return (
-		<>
+		<div className="library-panel__detail-container">
 			<Flex justify="flex-start">
 				<Navigator.BackButton
 					icon={ isRTL() ? chevronRight : chevronLeft }
@@ -337,7 +337,7 @@ function SectionDetailScreen( { section, onBack } ) {
 			<Spacer margin={ 4 } />
 
 			{ renderContent() }
-		</>
+		</div>
 	);
 }
 
