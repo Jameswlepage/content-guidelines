@@ -1,5 +1,7 @@
 # Content Guidelines
 
+[![WordPress Playground](https://img.shields.io/badge/WordPress%20Playground-Preview-blue?logo=wordpress)](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Jameswlepage/content-guidelines/main/blueprint.json)
+
 Site-level editorial guidelines for WordPress. Define voice, tone, copy rules, and vocabulary that AI features can consume.
 
 **Global Styles = how your site looks. Content Guidelines = how your site sounds.**
@@ -154,6 +156,25 @@ The schema follows the `theme.json` pattern used in WordPress core:
 - Gutenberg plugin (for full UI)
 
 For WordPress 6.9+, the plugin also registers with the Abilities API for AI assistant integration.
+
+## Development
+
+For local development with WordPress Playground:
+
+```bash
+# Clone the repo
+git clone https://github.com/Jameswlepage/content-guidelines.git
+cd content-guidelines
+
+# Install dependencies and build
+pnpm install
+pnpm run build
+
+# Start Playground with auto-mount
+npx @wp-playground/cli@latest server --auto-mount --port 7021 --login --blueprint=blueprint-dev.json
+```
+
+The dev blueprint enables application passwords for API testing without HTTPS.
 
 ## Related Docs
 
