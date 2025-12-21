@@ -1,0 +1,287 @@
+{
+  "title": "Mailchimp Content Guidelines",
+  "status": "publish",
+  "guidelines": {
+    "version": 1,
+    "brand_context": {
+      "site_description": "Mailchimp is an all-in-one marketing platform that helps small businesses market smarter so they can grow faster. We offer email marketing, automation, websites, social media tools, CRM capabilities, and audience insights. Founded as a small business ourselves, we understand the challenges entrepreneurs face and build tools that make professional marketing accessible to everyone.",
+      "audience": "Small business owners, entrepreneurs, solo marketers, and creators who want to grow their business through digital marketing. Many are running their business alongside other responsibilities and need tools that are powerful yet approachable.",
+      "primary_goal": "inform",
+      "topics": ["Email Marketing", "Marketing Automation", "Small Business", "E-commerce", "Customer Engagement", "Analytics", "Content Strategy", "Digital Marketing"]
+    },
+    "voice_tone": {
+      "description": "Human, familiar, and straightforward. We're the experienced and compassionate business partner we wish we'd had. We use dry humor—straight-faced, subtle, and a touch eccentric. We prioritize clarity over entertainment.",
+      "tone_traits": ["Plainspoken", "Genuine", "Helpful", "Dry wit", "Clear over clever", "Empowering", "Accessible", "Confident"],
+      "tone_notes": "Our tone is generally informal, but it's always more important to be clear than entertaining. Adjust tone based on the reader's emotional state—be more serious in error messages, more playful in success states. Our mascot Freddie smiles and winks, but he does not talk—never write in his voice.",
+      "pov": "we_you",
+      "readability": "simple"
+    },
+    "copy_rules": {
+      "dos": [
+        "Use active voice: Marti logged in instead of The account was logged into",
+        "Write in plain English that anyone can understand",
+        "Use positive language over negative",
+        "Lead with the main point and most important information",
+        "Use contractions freely to sound friendly and approachable",
+        "Use the serial comma",
+        "Write short sentences that are easy to scan",
+        "Put yourself in the reader's shoes before writing",
+        "Simplify complex terminology",
+        "Use gender-neutral language and singular they",
+        "Break up long passages with subheadings",
+        "Front-load paragraphs with key information"
+      ],
+      "donts": [
+        "Do not use passive voice constructions",
+        "Avoid slang and unexplained jargon",
+        "Never patronize or talk down to readers",
+        "Do not use clickbait or sensational language",
+        "Avoid vague language and unnecessary modifiers",
+        "Never force jokes that feel unnatural",
+        "Do not use directional language like click the button on the left",
+        "Avoid double negatives",
+        "Do not use blacklist or whitelist—use blocklist and allowlist",
+        "Never assume technical knowledge",
+        "Avoid starting sentences with There is or There are"
+      ]
+    },
+    "vocabulary": {
+      "prefer": [
+        {"term": "Mailchimp", "note": "Always capitalize the M and lowercase c"},
+        {"term": "email", "note": "One word, lowercase, no hyphen"},
+        {"term": "email campaign", "note": "Preferred over blast or newsletter blast"},
+        {"term": "automation", "note": "Our automated email sequences"},
+        {"term": "audience", "note": "Preferred over list or subscriber list"},
+        {"term": "subscriber", "note": "Individual email recipient"},
+        {"term": "template", "note": "Pre-designed email layouts"},
+        {"term": "landing page", "note": "Two words, standalone marketing pages"},
+        {"term": "analytics", "note": "Performance metrics and insights"},
+        {"term": "homepage", "note": "One word"},
+        {"term": "blocklist", "note": "Use instead of blacklist"},
+        {"term": "allowlist", "note": "Use instead of whitelist"},
+        {"term": "sign up", "note": "Two words as a verb"},
+        {"term": "sign-up", "note": "Hyphenated as adjective or noun"},
+        {"term": "log in", "note": "Two words as a verb"},
+        {"term": "login", "note": "One word as adjective or noun"},
+        {"term": "ecommerce", "note": "One word, no hyphen"},
+        {"term": "website", "note": "One word"},
+        {"term": "internet", "note": "Lowercase"},
+        {"term": "popup", "note": "One word, no hyphen"}
+      ],
+      "avoid": [
+        {"term": "blast", "note": "Sounds impersonal and aggressive—use email campaign"},
+        {"term": "e-mail", "note": "Outdated hyphenation—use email"},
+        {"term": "synergy", "note": "Corporate buzzword—be specific about what you mean"},
+        {"term": "leverage", "note": "Use simpler words like use or take advantage of"},
+        {"term": "utilize", "note": "Just say use"},
+        {"term": "click here", "note": "Not accessible—link descriptive keywords instead"},
+        {"term": "thought leader", "note": "Vague and self-congratulatory"},
+        {"term": "ninja", "note": "Unprofessional and appropriative"},
+        {"term": "rockstar", "note": "Unprofessional—describe actual skills"},
+        {"term": "simple", "note": "What's simple to you may not be to others"},
+        {"term": "easy", "note": "Subjective and potentially patronizing"},
+        {"term": "just", "note": "Minimizing word that implies tasks are trivial"},
+        {"term": "obviously", "note": "Condescending—if it were obvious, you would not need to say it"},
+        {"term": "please note", "note": "Unnecessary filler—just state the information"},
+        {"term": "in order to", "note": "Use to instead"},
+        {"term": "best-in-class", "note": "Marketing speak—be specific"},
+        {"term": "world-class", "note": "Vague superlative"},
+        {"term": "cutting-edge", "note": "Cliche—describe actual benefits"}
+      ],
+      "acronyms": ["API - Application Programming Interface", "CRM - Customer Relationship Management", "CTR - Click-Through Rate", "CTA - Call to Action", "ROI - Return on Investment", "A/B - A/B Testing (split testing)", "ESP - Email Service Provider", "GDPR - General Data Protection Regulation", "RSS - Really Simple Syndication", "URL - Uniform Resource Locator"],
+      "acronym_usage": "expand_first",
+      "custom_dictionary": ["Mailchimp", "Mandrill", "Intuit", "Freddie", "WordPress", "Gutenberg", "TinyLetter", "Mailchimp Presents"],
+      "voice_corrections": ["mail chimp → Mailchimp", "e-mail → email", "click here → descriptive link text", "MailChimp → Mailchimp", "MAILCHIMP → Mailchimp"]
+    },
+    "heuristics": {
+      "words_per_sentence": 15,
+      "sentences_per_paragraph": 3,
+      "paragraphs_per_section": 4,
+      "reading_level": "simple",
+      "max_syllables": 3
+    },
+    "references": {
+      "references": [
+        {"type": "website", "title": "Mailchimp Content Style Guide", "url": "https://styleguide.mailchimp.com", "notes": "Our public style guide—the source of truth for all content guidelines"},
+        {"type": "website", "title": "Voice and Tone", "url": "https://styleguide.mailchimp.com/voice-and-tone/", "notes": "Detailed guidance on voice characteristics and tone adjustments"},
+        {"type": "website", "title": "Grammar and Mechanics", "url": "https://styleguide.mailchimp.com/grammar-and-mechanics/", "notes": "Capitalization, punctuation, numbers, and formatting standards"},
+        {"type": "website", "title": "Word List", "url": "https://styleguide.mailchimp.com/word-list/", "notes": "Preferred spellings and terms to use or avoid"},
+        {"type": "website", "title": "Web Elements", "url": "https://styleguide.mailchimp.com/web-elements/", "notes": "Guidelines for buttons, links, forms, and navigation"},
+        {"type": "website", "title": "Writing for Accessibility", "url": "https://styleguide.mailchimp.com/writing-for-accessibility/", "notes": "Making content accessible to all readers"}
+      ],
+      "notes": "These references represent our gold standard for content. When in doubt, refer to the public style guide."
+    },
+    "images": {
+      "style": "Authentic, warm, and diverse. Show real small business scenarios with natural lighting. Feature people who look like our actual customers—diverse in age, ethnicity, ability, and style. Avoid generic corporate imagery.",
+      "alt_text_guidelines": "Describe both the content and purpose of the image. For decorative images, use empty alt text. Keep alt text under 125 characters. Never start with image of or picture of.",
+      "reference_images": [],
+      "dos": [
+        "Use authentic imagery that reflects our diverse customer base",
+        "Show real small business scenarios and environments",
+        "Include clear, readable screenshots with annotations when helpful",
+        "Use natural lighting that feels warm and approachable",
+        "Feature real products and workspaces over stock photos",
+        "Include alt text for all informative images"
+      ],
+      "donts": [
+        "Avoid generic stock photos with forced smiles",
+        "Do not use low-resolution or pixelated images",
+        "Never include sensitive customer data in screenshots",
+        "Avoid overly polished or corporate-looking imagery",
+        "Do not use images that require cultural context to understand",
+        "Never use images with embedded text as the only way to convey information"
+      ],
+      "text_policy": "only_if_requested"
+    },
+    "notes": "Mailchimp began as a small business ourselves. We know marketing technology can be a minefield of confusing terminology. That is why we speak like the experienced and compassionate business partner we wish we had.\n\nWe prioritize clarity over entertainment. When humor works naturally, use it. When it does not, skip it.\n\nRemember that our audience spans the globe. Write for translation: use simple sentence structures, avoid idioms and cultural references that may not translate well.\n\nAlways consider the reader's emotional state. Someone troubleshooting an error needs clear, direct help—not jokes. Someone celebrating a successful campaign can enjoy a lighter touch.",
+    "blocks": {
+      "core/paragraph": {
+        "copy_rules": {
+          "dos": ["Keep paragraphs to 3-4 sentences maximum", "Lead with the main point", "Use plain language that anyone can understand", "Break up long content with subheadings", "Use transition words sparingly"],
+          "donts": ["Do not start paragraphs with However or Additionally", "Avoid walls of text", "Never bury important information mid-paragraph", "Do not use complex sentence structures"]
+        },
+        "notes": "Write for scanning—most readers skim first. If a paragraph exceeds 4 sentences, consider breaking it up or using a list."
+      },
+      "core/heading": {
+        "copy_rules": {
+          "dos": ["Use sentence case for H2 and below", "Make headings descriptive of content that follows", "Follow heading hierarchy strictly (H1 → H2 → H3)", "Keep headings under 8 words when possible", "Use headings to create scannable structure"],
+          "donts": ["Do not use questions as headings unless rhetorical", "Avoid single-word headings", "Never skip heading levels (H2 → H4)", "Do not use headings for styling purposes", "Avoid headings that all sound the same"]
+        },
+        "notes": "Headings are navigation aids. Someone should understand the article structure from headings alone. Page titles (H1) use title case; all other headings use sentence case."
+      },
+      "core/button": {
+        "copy_rules": {
+          "dos": ["Use action verbs that describe what happens next", "Keep button text under 5 words", "Use sentence case", "Make button purpose clear out of context", "Start with a verb when possible"],
+          "donts": ["Do not use Click here or Learn more alone", "Avoid generic Submit or Send", "Never use all caps", "Do not use punctuation in button text", "Avoid vague actions like Go or Continue"]
+        },
+        "notes": "Think of buttons as completing: I want to... Good examples: Create campaign, Download report, Start free trial. Buttons should make sense without surrounding context."
+      },
+      "core/list": {
+        "copy_rules": {
+          "dos": ["Use parallel structure for all list items", "Keep items concise and scannable", "Order logically—by importance, sequence, or alphabetically", "Introduce lists with a lead-in sentence", "Use numbered lists for sequential steps"],
+          "donts": ["Do not mix sentence fragments with full sentences", "Avoid lists with only 2 items—use a sentence instead", "Never use a list when a simple sentence would work", "Do not end list items with semicolons", "Avoid deeply nested lists (more than 2 levels)"]
+        },
+        "notes": "Lists are powerful for scannability. Use bulleted lists for non-sequential items, numbered lists for steps or ranked items."
+      },
+      "core/image": {
+        "copy_rules": {
+          "dos": ["Write descriptive alt text that conveys image purpose", "Include captions that add context beyond the image", "Keep alt text under 125 characters", "Describe the function, not just appearance"],
+          "donts": ["Do not leave alt text empty for informative images", "Avoid starting alt text with Image of or Picture of", "Never use images of text as the only way to convey information", "Do not include redundant information in captions"]
+        },
+        "notes": "Alt text should describe what a screen reader user needs to know. For decorative images, use empty alt text. For complex images like charts, provide a text summary."
+      },
+      "core/quote": {
+        "copy_rules": {
+          "dos": ["Include attribution for all quotes", "Use quotes to add authority or human perspective", "Keep quotes relevant to surrounding content", "Verify quote accuracy"],
+          "donts": ["Do not use quotes for visual emphasis", "Avoid very long quotes—summarize when possible", "Never alter quotes without indicating changes", "Do not use pull quotes that repeat nearby text"]
+        },
+        "notes": "Quotes work best when they add a human voice or expert credibility. Always include who said it and their relevant context."
+      },
+      "core/code": {
+        "copy_rules": {
+          "dos": ["Use inline code for short references like variable names", "Use code blocks for multi-line examples", "Include comments for complex code", "Test code examples before publishing"],
+          "donts": ["Do not use code formatting for emphasis", "Avoid unexplained code snippets", "Never include sensitive information like API keys", "Do not assume readers know programming concepts"]
+        },
+        "notes": "Code examples should be copy-paste ready and tested. Always explain what the code does in plain language before or after the block."
+      },
+      "core/table": {
+        "copy_rules": {
+          "dos": ["Use clear, concise header labels", "Align numbers to the right for easy comparison", "Include a caption describing the table", "Keep tables simple—consider breaking up complex data"],
+          "donts": ["Do not use tables for layout purposes", "Avoid tables with too many columns (more than 5-6)", "Never leave cells empty without explanation", "Do not merge cells unless absolutely necessary"]
+        },
+        "notes": "Tables are great for comparing data. Include a header row and consider mobile users—complex tables may need alternative presentations."
+      },
+      "core/separator": {
+        "copy_rules": {
+          "dos": ["Use separators to indicate major topic shifts", "Use consistently throughout a piece"],
+          "donts": ["Do not overuse separators", "Avoid using separators between every section", "Never use separators as visual decoration"]
+        },
+        "notes": "Separators indicate a significant break in content. If sections are related, use headings instead."
+      },
+      "core/columns": {
+        "copy_rules": {
+          "dos": ["Keep content length balanced across columns", "Use columns for comparing related information", "Consider mobile stacking behavior"],
+          "donts": ["Do not use columns for unrelated content", "Avoid more than 3 columns on standard content", "Never put long-form content in narrow columns"]
+        },
+        "notes": "Columns work best for side-by-side comparisons or feature highlights. Remember that columns stack on mobile."
+      },
+      "core/group": {
+        "copy_rules": {
+          "dos": ["Use groups to create visual sections", "Maintain consistent spacing within groups"],
+          "donts": ["Do not nest groups too deeply", "Avoid using groups purely for background colors"]
+        },
+        "notes": "Groups help organize related content visually. Use them to create clear content sections."
+      },
+      "core/media-text": {
+        "copy_rules": {
+          "dos": ["Balance text length with image size", "Use for feature highlights or introductions", "Ensure text and image complement each other"],
+          "donts": ["Do not use for long-form content", "Avoid small images with lots of text", "Never use decorative images that do not support the text"]
+        },
+        "notes": "Media-text blocks work well for product features, testimonials, or section introductions. Keep text concise."
+      },
+      "core/cover": {
+        "copy_rules": {
+          "dos": ["Keep overlay text short and impactful", "Ensure sufficient contrast for readability", "Use for section headers or calls to action"],
+          "donts": ["Do not use cover blocks for body content", "Avoid busy background images that compete with text", "Never rely solely on color contrast—consider all users"]
+        },
+        "notes": "Cover blocks create visual impact. Test readability across different screens and ensure text remains visible."
+      },
+      "core/gallery": {
+        "copy_rules": {
+          "dos": ["Include alt text for each image", "Use captions to add context", "Curate galleries—quality over quantity"],
+          "donts": ["Do not include duplicate or very similar images", "Avoid galleries with only 1-2 images", "Never mix unrelated images in a single gallery"]
+        },
+        "notes": "Galleries showcase multiple related images. Each image should serve a purpose and have descriptive alt text."
+      },
+      "core/embed": {
+        "copy_rules": {
+          "dos": ["Provide context before embedded content", "Consider users who cannot access embedded content", "Use embeds to add value, not fill space"],
+          "donts": ["Do not embed auto-playing media", "Avoid embeds that slow page loading significantly", "Never embed content without reviewing it first"]
+        },
+        "notes": "Embeds bring in external content. Always introduce what the embed contains and why it is relevant."
+      },
+      "core/video": {
+        "copy_rules": {
+          "dos": ["Include captions or transcripts for accessibility", "Provide context about video content and length", "Use descriptive titles"],
+          "donts": ["Do not autoplay videos", "Avoid very long videos without chapter markers", "Never use video when text would be more efficient"]
+        },
+        "notes": "Videos should be accessible with captions. Let users know what to expect before they click play."
+      },
+      "core/audio": {
+        "copy_rules": {
+          "dos": ["Provide transcripts for accessibility", "Include duration and content description", "Use descriptive file names and titles"],
+          "donts": ["Do not autoplay audio", "Avoid audio-only content without text alternative", "Never use audio for critical information without backup"]
+        },
+        "notes": "Audio content needs text alternatives. Always include transcripts and let users control playback."
+      },
+      "core/file": {
+        "copy_rules": {
+          "dos": ["Use descriptive file names", "Include file size and format", "Explain what the file contains"],
+          "donts": ["Do not use generic names like Document.pdf", "Avoid very large files without warning", "Never upload files containing sensitive information"]
+        },
+        "notes": "File blocks should clearly communicate what users are downloading and why it is valuable."
+      },
+      "core/pullquote": {
+        "copy_rules": {
+          "dos": ["Use for key insights worth highlighting", "Keep pullquotes concise", "Include attribution when quoting someone"],
+          "donts": ["Do not repeat text verbatim from nearby paragraphs", "Avoid overusing pullquotes—one per section maximum", "Never use pullquotes just for visual interest"]
+        },
+        "notes": "Pullquotes highlight key points. They should offer value to readers who are scanning."
+      },
+      "core/details": {
+        "copy_rules": {
+          "dos": ["Use clear, descriptive summary text", "Keep collapsed content focused", "Use for supplementary information"],
+          "donts": ["Do not hide critical information in collapsed sections", "Avoid nesting details within details", "Never use for primary content users must see"]
+        },
+        "notes": "Details blocks help manage information density. The summary should clearly indicate what is inside."
+      },
+      "core/footnotes": {
+        "copy_rules": {
+          "dos": ["Use for citations and supplementary notes", "Keep footnote content concise", "Number footnotes consistently"],
+          "donts": ["Do not use footnotes for essential information", "Avoid very long footnotes", "Never use footnotes in place of inline explanations"]
+        },
+        "notes": "Footnotes are for references and tangential information. Important content belongs in the main text."
+      }
+    }
+  }
+}

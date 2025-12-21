@@ -167,20 +167,20 @@ class Post_Type {
 				'voice_tone'    => array(
 					'type'       => 'object',
 					'properties' => array(
-						'tone_traits'   => array(
+						'description' => array( 'type' => 'string' ),
+						'tone_traits' => array(
 							'type'  => 'array',
 							'items' => array( 'type' => 'string' ),
 						),
-						'pov'           => array(
+						'tone_notes'  => array( 'type' => 'string' ),
+						'pov'         => array(
 							'type' => 'string',
 							'enum' => array( 'we_you', 'i_you', 'third_person', '' ),
 						),
-						'readability'   => array(
+						'readability' => array(
 							'type' => 'string',
 							'enum' => array( 'simple', 'general', 'expert', '' ),
 						),
-						'example_good'  => array( 'type' => 'string' ),
-						'example_avoid' => array( 'type' => 'string' ),
 					),
 				),
 				'copy_rules'    => array(
@@ -203,7 +203,8 @@ class Post_Type {
 				'vocabulary'    => array(
 					'type'       => 'object',
 					'properties' => array(
-						'prefer' => array(
+						// Rich object arrays with term and note.
+						'prefer'            => array(
 							'type'  => 'array',
 							'items' => array(
 								'type'       => 'object',
@@ -213,7 +214,7 @@ class Post_Type {
 								),
 							),
 						),
-						'avoid'  => array(
+						'avoid'             => array(
 							'type'  => 'array',
 							'items' => array(
 								'type'       => 'object',
@@ -222,9 +223,94 @@ class Post_Type {
 									'note' => array( 'type' => 'string' ),
 								),
 							),
+						),
+						// Additional vocabulary fields.
+						'acronyms'          => array(
+							'type'  => 'array',
+							'items' => array( 'type' => 'string' ),
+						),
+						'acronym_usage'     => array(
+							'type' => 'string',
+							'enum' => array( 'expand_first', 'always_expand', 'acronym_only', '' ),
+						),
+						'custom_dictionary' => array(
+							'type'  => 'array',
+							'items' => array( 'type' => 'string' ),
+						),
+						'voice_corrections' => array(
+							'type'  => 'array',
+							'items' => array( 'type' => 'string' ),
 						),
 					),
 				),
+				'heuristics'    => array(
+					'type'       => 'object',
+					'properties' => array(
+						'words_per_sentence'      => array( 'type' => 'integer' ),
+						'sentences_per_paragraph' => array( 'type' => 'number' ),
+						'paragraphs_per_section'  => array( 'type' => 'integer' ),
+						'reading_level'           => array(
+							'type' => 'string',
+							'enum' => array( 'simple', 'standard', 'advanced', 'custom', '' ),
+						),
+						'reading_level_custom'    => array( 'type' => 'string' ),
+						'max_syllables'           => array( 'type' => 'integer' ),
+					),
+				),
+				'references'    => array(
+					'type'       => 'object',
+					'properties' => array(
+						'references' => array(
+							'type'  => 'array',
+							'items' => array(
+								'type'       => 'object',
+								'properties' => array(
+									'type'  => array(
+										'type' => 'string',
+										'enum' => array( 'website', 'article', 'book', 'document', 'competitor', 'other' ),
+									),
+									'title' => array( 'type' => 'string' ),
+									'url'   => array( 'type' => 'string' ),
+									'notes' => array( 'type' => 'string' ),
+								),
+							),
+						),
+						'notes'      => array( 'type' => 'string' ),
+					),
+				),
+				'images'        => array(
+					'type'       => 'object',
+					'properties' => array(
+						'style'               => array( 'type' => 'string' ),
+						'alt_text_guidelines' => array( 'type' => 'string' ),
+						'reference_images'    => array(
+							'type'  => 'array',
+							'items' => array(
+								'type'       => 'object',
+								'properties' => array(
+									'id'    => array( 'type' => 'integer' ),
+									'url'   => array( 'type' => 'string' ),
+									'alt'   => array( 'type' => 'string' ),
+									'notes' => array( 'type' => 'string' ),
+								),
+							),
+						),
+						// Keep image_style fields for API compatibility.
+						'dos'                 => array(
+							'type'  => 'array',
+							'items' => array( 'type' => 'string' ),
+						),
+						'donts'               => array(
+							'type'  => 'array',
+							'items' => array( 'type' => 'string' ),
+						),
+						'text_policy'         => array(
+							'type' => 'string',
+							'enum' => array( 'never', 'only_if_requested', 'ok', '' ),
+						),
+					),
+				),
+				// Keep image_style for backward compatibility.
 				'image_style'   => array(
 					'type'       => 'object',
 					'properties' => array(
@@ -371,11 +457,11 @@ class Post_Type {
 				'topics'           => array(),
 			),
 			'voice_tone'    => array(
-				'tone_traits'   => array(),
-				'pov'           => '',
-				'readability'   => 'general',
-				'example_good'  => '',
-				'example_avoid' => '',
+				'description' => '',
+				'tone_traits' => array(),
+				'tone_notes'  => '',
+				'pov'         => '',
+				'readability' => 'general',
 			),
 			'copy_rules'    => array(
 				'dos'        => array(),
@@ -383,13 +469,32 @@ class Post_Type {
 				'formatting' => array(),
 			),
 			'vocabulary'    => array(
-				'prefer' => array(),
-				'avoid'  => array(),
+				'prefer'            => array(), // Array of {term, note} objects.
+				'avoid'             => array(), // Array of {term, note} objects.
+				'acronyms'          => array(),
+				'acronym_usage'     => 'expand_first',
+				'custom_dictionary' => array(),
+				'voice_corrections' => array(),
 			),
-			'image_style'   => array(
-				'dos'         => array(),
-				'donts'       => array(),
-				'text_policy' => '',
+			'heuristics'    => array(
+				'words_per_sentence'      => null,
+				'sentences_per_paragraph' => null,
+				'paragraphs_per_section'  => null,
+				'reading_level'           => '',
+				'reading_level_custom'    => '',
+				'max_syllables'           => null,
+			),
+			'references'    => array(
+				'references' => array(),
+				'notes'      => '',
+			),
+			'images'        => array(
+				'style'               => '',
+				'alt_text_guidelines' => '',
+				'reference_images'    => array(),
+				'dos'                 => array(),
+				'donts'               => array(),
+				'text_policy'         => '',
 			),
 			'notes'         => '',
 			'blocks'        => array(),

@@ -31,6 +31,7 @@ import { isRTL } from '@wordpress/i18n';
  */
 import { STORE_NAME } from '../../store';
 import RepeaterControl from '../controls/repeater-control';
+import TermNoteControl from '../controls/term-note-control';
 import './style.scss';
 
 /**
@@ -643,10 +644,34 @@ function SectionDetailScreen( { section, onBack } ) {
 						/>
 						<FormTokenField
 							label={ __( 'Voice attributes', 'content-guidelines' ) }
-							value={ sectionData.attributes || [] }
-							onChange={ ( value ) => handleChange( 'attributes', value ) }
+							value={ sectionData.tone_traits || [] }
+							onChange={ ( value ) => handleChange( 'tone_traits', value ) }
 							__experimentalExpandOnFocus
 							__experimentalShowHowTo={ false }
+						/>
+						<SelectControl
+							__nextHasNoMarginBottom
+							label={ __( 'Point of view', 'content-guidelines' ) }
+							value={ sectionData.pov || '' }
+							options={ [
+								{ value: '', label: __( 'Not specified', 'content-guidelines' ) },
+								{ value: 'we_you', label: __( 'We/You (conversational)', 'content-guidelines' ) },
+								{ value: 'i_you', label: __( 'I/You (personal)', 'content-guidelines' ) },
+								{ value: 'third_person', label: __( 'Third person (formal)', 'content-guidelines' ) },
+							] }
+							onChange={ ( value ) => handleChange( 'pov', value ) }
+						/>
+						<SelectControl
+							__nextHasNoMarginBottom
+							label={ __( 'Readability level', 'content-guidelines' ) }
+							value={ sectionData.readability || '' }
+							options={ [
+								{ value: '', label: __( 'Not specified', 'content-guidelines' ) },
+								{ value: 'simple', label: __( 'Simple (grade 6-8)', 'content-guidelines' ) },
+								{ value: 'general', label: __( 'General (grade 9-12)', 'content-guidelines' ) },
+								{ value: 'expert', label: __( 'Expert (college+)', 'content-guidelines' ) },
+							] }
+							onChange={ ( value ) => handleChange( 'readability', value ) }
 						/>
 						<TextareaControl
 							__nextHasNoMarginBottom
@@ -680,19 +705,19 @@ function SectionDetailScreen( { section, onBack } ) {
 			case 'vocabulary':
 				return (
 					<VStack spacing={ 4 }>
-						<FormTokenField
+						<TermNoteControl
 							label={ __( 'Preferred terms', 'content-guidelines' ) }
-							value={ sectionData.preferred || [] }
-							onChange={ ( value ) => handleChange( 'preferred', value ) }
-							__experimentalExpandOnFocus
-							__experimentalShowHowTo={ false }
+							items={ sectionData.prefer || [] }
+							onChange={ ( value ) => handleChange( 'prefer', value ) }
+							termPlaceholder={ __( 'Term to use', 'content-guidelines' ) }
+							notePlaceholder={ __( 'Usage note (optional)', 'content-guidelines' ) }
 						/>
-						<FormTokenField
+						<TermNoteControl
 							label={ __( 'Terms to avoid', 'content-guidelines' ) }
-							value={ sectionData.avoid || [] }
+							items={ sectionData.avoid || [] }
 							onChange={ ( value ) => handleChange( 'avoid', value ) }
-							__experimentalExpandOnFocus
-							__experimentalShowHowTo={ false }
+							termPlaceholder={ __( 'Term to avoid', 'content-guidelines' ) }
+							notePlaceholder={ __( 'Why? / Use instead (optional)', 'content-guidelines' ) }
 						/>
 
 						<div className="library-panel__divider">
