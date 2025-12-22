@@ -10,14 +10,14 @@ namespace ContentGuidelines;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Handles the wp_content_guidelines custom post type.
+ * Handles the content_guidelines custom post type.
  */
 class Post_Type {
 
 	/**
 	 * Post type name.
 	 */
-	const POST_TYPE = 'wp_content_guidelines';
+	const POST_TYPE = 'content_guidelines';
 
 	/**
 	 * Option key for storing the canonical guidelines post ID.
