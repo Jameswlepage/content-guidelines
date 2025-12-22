@@ -38,6 +38,7 @@ jobs:
           cp -r build content-guidelines/
           cp -r includes content-guidelines/
           cp -r docs content-guidelines/
+          cp -r samples content-guidelines/
           cp content-guidelines.php content-guidelines/
           cp readme.txt content-guidelines/ 2>/dev/null || true
           cp README.md content-guidelines/
