@@ -568,6 +568,71 @@ function ImagesContent( { sectionData, onChange } ) {
 }
 
 /**
+ * Get empty section data structure.
+ *
+ * @param {string} sectionId Section ID.
+ * @return {Object} Empty section data.
+ */
+function getEmptySection( sectionId ) {
+	switch ( sectionId ) {
+		case 'brand_context':
+			return {
+				site_description: '',
+				audience: '',
+				primary_goal: '',
+				topics: [],
+			};
+		case 'voice_tone':
+			return {
+				description: '',
+				tone_traits: [],
+				tone_notes: '',
+				pov: '',
+				readability: '',
+			};
+		case 'copy_rules':
+			return {
+				dos: [],
+				donts: [],
+			};
+		case 'vocabulary':
+			return {
+				prefer: [],
+				avoid: [],
+				acronyms: [],
+				acronym_usage: 'expand_first',
+				custom_dictionary: [],
+				voice_corrections: [],
+			};
+		case 'heuristics':
+			return {
+				words_per_sentence: '',
+				sentences_per_paragraph: '',
+				paragraphs_per_section: '',
+				reading_level: '',
+				reading_level_custom: '',
+				max_syllables: '',
+			};
+		case 'references':
+			return {
+				references: [],
+				notes: '',
+			};
+		case 'images':
+			return {
+				style: '',
+				alt_text_guidelines: '',
+				reference_images: [],
+				dos: [],
+				donts: [],
+				text_policy: '',
+			};
+		default:
+			return {};
+	}
+}
+
+/**
  * Section detail screen component.
  *
  * @param {Object}   props           Component props.
@@ -794,9 +859,17 @@ function SectionDetailScreen( { section, onBack } ) {
 		}
 	};
 
+	const handleClear = () => {
+		if ( section.id === 'notes' ) {
+			handleTopLevelChange( 'notes', '' );
+		} else {
+			updateDraftSection( section.id, getEmptySection( section.id ) );
+		}
+	};
+
 	return (
 		<div className="library-panel__detail-container">
-			<Flex justify="flex-start">
+			<div className="library-panel__detail-header">
 				<Navigator.BackButton
 					icon={ isRTL() ? chevronRight : chevronLeft }
 					size="small"
@@ -810,7 +883,15 @@ function SectionDetailScreen( { section, onBack } ) {
 				>
 					{ section.title }
 				</Heading>
-			</Flex>
+				<Button
+					variant="tertiary"
+					isDestructive
+					size="small"
+					onClick={ handleClear }
+				>
+					{ __( 'Clear', 'content-guidelines' ) }
+				</Button>
+			</div>
 
 			<Spacer margin={ 4 } />
 
@@ -853,6 +934,11 @@ function hasContent( value ) {
  * @return {string|null} Status text.
  */
 function getSectionStatus( sectionId, draft ) {
+	// Notes is a top-level string, not a nested object.
+	if ( sectionId === 'notes' ) {
+		return hasContent( draft.notes ) ? __( 'Configured', 'content-guidelines' ) : null;
+	}
+
 	const sectionData = draft[ sectionId ];
 	if ( ! sectionData || typeof sectionData !== 'object' ) {
 		return null;

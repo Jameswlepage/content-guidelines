@@ -92,6 +92,16 @@
 }
 
 // Detail screen header
+.library-panel__detail-header {
+	display: flex;
+	align-items: center;
+	gap: 0;
+
+	.components-button:last-child {
+		margin-left: auto;
+	}
+}
+
 .library-panel__detail-title {
 	font-size: 13px;
 	font-weight: 500;

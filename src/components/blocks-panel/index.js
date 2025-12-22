@@ -145,6 +145,13 @@ function BlockDetailScreen( { block, onBack } ) {
 		} );
 	};
 
+	const handleClear = () => {
+		updateBlockGuidelines( block.name, {
+			copy_rules: { dos: [], donts: [] },
+			notes: '',
+		} );
+	};
+
 	if ( ! block ) {
 		return null;
 	}
@@ -185,7 +192,7 @@ function BlockDetailScreen( { block, onBack } ) {
 
 	return (
 		<div className="blocks-panel__detail-container">
-			<Flex justify="flex-start">
+			<div className="blocks-panel__detail-header">
 				<Navigator.BackButton
 					icon={ isRTL() ? chevronRight : chevronLeft }
 					size="small"
@@ -199,7 +206,15 @@ function BlockDetailScreen( { block, onBack } ) {
 				>
 					{ block.title }
 				</Heading>
-			</Flex>
+				<Button
+					variant="tertiary"
+					isDestructive
+					size="small"
+					onClick={ handleClear }
+				>
+					{ __( 'Clear', 'content-guidelines' ) }
+				</Button>
+			</div>
 
 			<Spacer margin={ 4 } />
 
