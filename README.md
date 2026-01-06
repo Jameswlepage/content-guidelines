@@ -6,6 +6,9 @@ Site-level editorial guidelines for WordPress. Define voice, tone, copy rules, a
 
 **Global Styles = how your site looks. Content Guidelines = how your site sounds.**
 
+<img width="3024" height="1724" alt="CleanShot 2026-01-06 at 07 10 23@2x" src="https://github.com/user-attachments/assets/2cb78f65-9927-4984-b10b-b0e001a77e1e" />
+
+
 ## Installation
 
 1. Download the plugin
